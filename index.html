@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELL PIZZA | All You Can Eat Night</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <div class="texture-overlay"></div>
+    
+    <main class="container shadow-bleed">
+        <div id="bookingPage" class="screen active">
+            <div class="hero-section text-center">
+                <h2 class="display-text glow-red">ALL YOU CAN EAT PIZZA</h2>
+                <p class="subtitle">EVERY TUESDAY AT HELL PIZZA BOND ST</p>
+            </div>
+
+            <form id="bookingForm" class="booking-grid">
+                <div class="form-main">
+                    <div class="input-group">
+                        <label><i data-lucide="calendar"></i> Select Tuesday Session</label>
+                        <div class="date-selector-grid" id="tuesdaySelector">
+                            <!-- JS will generate upcoming Tuesdays here -->
+                        </div>
+                        <input type="hidden" id="sessionDate" required>
+                        <div id="dateError" class="error-msg">PLEASE SELECT A TUESDAY SESSION.</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label><i data-lucide="user"></i> Name</label>
+                        <input type="text" id="custName" required placeholder="Enter your soul's name">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label><i data-lucide="phone"></i> Phone Number</label>
+                        <input type="tel" id="custPhone" required placeholder="021 666 000">
+                    </div>
+
+                    <div class="input-group">
+                        <label><i data-lucide="users"></i> How many guests?</label>
+                        <div class="guest-selector" id="guestSelector">
+                            <!-- JS will generate 15 buttons here -->
+                        </div>
+                        <input type="hidden" id="numGuests" value="1">
+                        <div class="call-store-msg">
+                            <i data-lucide="info" size="14"></i> For bookings over 15 people, please call the store on 04 473 5186
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-slots">
+                    <label><i data-lucide="clock"></i> Choose Arrival Time</label>
+                    <div class="slots-container" id="slotsContainer">
+                        <button type="button" class="slot-btn" data-time="5:30">
+                            <span class="time">5:30 PM</span>
+                            <span class="availability">UPDATING...</span>
+                        </button>
+                        <button type="button" class="slot-btn" data-time="6:00">
+                            <span class="time">6:00 PM</span>
+                            <span class="availability">UPDATING...</span>
+                        </button>
+                        <button type="button" class="slot-btn" data-time="6:30">
+                            <span class="time">6:30 PM</span>
+                            <span class="availability">UPDATING...</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="selectedTime" required>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="btn-text">RESERVE MY TICKET/S</span>
+                        <div class="btn-loader"></div>
+                    </button>
+                    <p class="terms">All Tuesday evening sessions end at 8:00pm latest. Please eat responsibly.</p>
+                </div>
+            </form>
+        </div>
+
+        <div id="successPage" class="screen">
+            <div class="success-message">
+                <i data-lucide="check-circle" class="success-icon"></i>
+                <h2 class="display-text">YOU'RE IN</h2>
+                <p>Your table is secured. See you in HELL.</p>
+                <button type="button" class="hell-btn-alt" onclick="resetForm()">MAKE ANOTHER BOOKING</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <a href="https://order.hellpizza.nz" target="_blank">ORDER.HELLPIZZA.NZ</a>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

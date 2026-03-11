@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELL PIZZA | Admin Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="admin-body">
+    <div class="texture-overlay"></div>
+    
+    <main class="container shadow-bleed">
+        <div id="adminPage">
+            <div class="admin-header">
+                <h2 class="display-text">ADMIN PORTAL</h2>
+                <div class="admin-actions">
+                    <button onclick="refreshData()" class="action-btn"><i data-lucide="refresh-cw"></i></button>
+                    <button onclick="copyShareLink()" class="action-btn"><i data-lucide="link"></i></button>
+                    <a href="index.html" class="action-btn"><i data-lucide="home"></i></a>
+                </div>
+            </div>
+
+            <!-- Date selector for Admin to view different sessions -->
+            <div class="input-group">
+                <label><i data-lucide="calendar"></i> Select Session Date</label>
+                <div class="date-selector-grid" id="tuesdaySelector">
+                    <!-- JS will generate upcoming Tuesdays here -->
+                </div>
+            </div>
+            
+            <div id="adminStats" class="admin-stats">
+                <!-- Stats injected here -->
+            </div>
+
+            <div class="table-vessel">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>TIME</th>
+                            <th>CUSTOMER</th>
+                            <th>GUESTS</th>
+                            <th>PHONE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="loadingIndicator" style="display: none; text-align: center; margin-top: 2rem;">
+                <p class="subtitle">SUMMONING BOOKINGS...</p>
+            </div>
+        </div>
+
+        <!-- Hidden Edit Modal -->
+        <div id="editModal" class="screen" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 2rem;">
+            <div class="container" style="max-width: 500px; margin: 0;">
+                <h2 class="display-text" style="font-size: 3rem; margin-bottom: 2rem;">EDIT BOOKING</h2>
+                <form id="editForm">
+                    <input type="hidden" id="editTimestamp">
+                    <div class="input-group">
+                        <label>Customer Name</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="editPhone" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Guest Count</label>
+                        <input type="number" id="editGuests" min="1" max="15" required style="width: 100%; padding: 1.2rem; background: rgba(225,216,183,0.03); border: 1px solid rgba(225,216,183,0.15); color: var(--hell-bone);">
+                    </div>
+                    <div class="input-group">
+                        <label>Arrival Time</label>
+                        <select id="editTime" style="width: 100%; padding: 1.2rem; background: #151515; border: 1px solid rgba(225,216,183,0.15); color: var(--hell-bone);">
+                            <option value="5:30">5:30 PM</option>
+                            <option value="6:00">6:00 PM</option>
+                            <option value="6:30">6:30 PM</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="submit-btn" style="font-size: 1.5rem; padding: 1rem;">SAVE</button>
+                        <button type="button" class="hell-btn-alt" onclick="closeEditModal()" style="margin: 0; padding: 1rem;">CANCEL</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <a href="https://order.hellpizza.nz" target="_blank">ORDER.HELLPIZZA.NZ</a>
+    </footer>
+
+    <script src="admin.js"></script>
+</body>
+</html>
