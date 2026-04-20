@@ -204,9 +204,13 @@ async function handleFormSubmit(e) {
         guests: appState.numGuests,
         time: appState.selectedTime,
         date: appState.selectedDate,
+<<<<<<< HEAD
         requests: document.getElementById('specialRequests').value || '',
         ref: bookingRef,
         manageUrl: manageUrl
+=======
+        requests: document.getElementById('specialRequests').value || ''
+>>>>>>> 86aee33ff29998490181b528df4d4b5b13a5d0d7
     };
 
     try {
