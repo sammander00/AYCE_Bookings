@@ -1,6 +1,5 @@
 /* Google Sheets Configuration */
 const CONFIG = {
-    // REPLACE THIS URL AFTER DEPLOYING APPS SCRIPT
     API_URL: "https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec",
     CAPACITY_PER_SLOT: 30
 };
@@ -20,6 +19,14 @@ let appState = {
     loading: false
 };
 
+// Generate a unique booking reference (e.g. HELL-A3F9)
+function generateRef() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let ref = 'HELL-';
+    for (let i = 0; i < 6; i++) ref += chars[Math.floor(Math.random() * chars.length)];
+    return ref;
+}
+
 // Initialize Lucide Icons
 lucide.createIcons();
 
@@ -27,34 +34,31 @@ lucide.createIcons();
 const elements = {
     bookingForm: document.getElementById('bookingForm'),
     guestSelector: document.getElementById('guestSelector'),
-    tuesdaySelector: document.getElementById('tuesdaySelector'), // Custom selector
-    sessionDate: document.getElementById('sessionDate'), // Hidden input
+    tuesdaySelector: document.getElementById('tuesdaySelector'),
+    sessionDate: document.getElementById('sessionDate'),
     dateError: document.getElementById('dateError'),
     slotBtns: document.querySelectorAll('.slot-btn'),
     screens: document.querySelectorAll('.screen'),
     submitBtn: document.getElementById('submitBtn')
 };
 
-// Initialize Date Picker (Custom Tuesday Buttons)
+// Initialize Date Picker
 function initDatePicker() {
     const selector = elements.tuesdaySelector;
     selector.innerHTML = '';
-    
-    // Generate next 4 Tuesdays
+
     let date = new Date();
-    // Go to next Tuesday
     date.setDate(date.getDate() + (7 - date.getDay() + 2) % 7);
     if (new Date().getDay() === 2 && new Date().getHours() >= 20) {
-        // If it's Tuesday after 8pm, start from next week
         date.setDate(date.getDate() + 7);
     }
 
-    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
     for (let i = 0; i < 4; i++) {
         const d = new Date(date);
         const dateStr = d.toISOString().split('T')[0];
-        
+
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'selector-btn';
@@ -62,21 +66,18 @@ function initDatePicker() {
             <span class="date-day">${d.getDate()}</span>
             <span class="date-month">${months[d.getMonth()]}</span>
         `;
-        
+
         btn.onclick = () => {
             appState.selectedDate = dateStr;
             elements.sessionDate.value = dateStr;
-            
-            // UI Toggle
             selector.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             elements.dateError.style.display = 'none';
-            
             refreshData();
         };
-        
+
         selector.appendChild(btn);
-        date.setDate(date.getDate() + 7); // Next Tuesday
+        date.setDate(date.getDate() + 7);
     }
 }
 initDatePicker();
@@ -126,9 +127,8 @@ function updateSlotsUI() {
         const time = btn.dataset.time;
         const slot = appState.slots.find(s => s.time === time);
         const remaining = slot ? (slot.capacity - slot.booked) : 30;
-        
         const availText = btn.querySelector('.availability');
-        
+
         if (remaining <= 0) {
             btn.classList.add('disabled');
             btn.classList.remove('active', 'urgent');
@@ -136,20 +136,13 @@ function updateSlotsUI() {
         } else {
             btn.classList.remove('disabled');
             availText.textContent = `${remaining} SEATS LEFT`;
-            
-            if (remaining <= 10) {
-                btn.classList.add('urgent');
-            } else {
-                btn.classList.remove('urgent');
-            }
-            
-            // Check group size
+            btn.classList.toggle('urgent', remaining <= 10);
             if (remaining < appState.numGuests) {
                 btn.classList.add('disabled');
                 availText.textContent = `NEED ${appState.numGuests} SEATS`;
             }
         }
-        
+
         btn.classList.toggle('active', appState.selectedTime === time);
     });
     document.getElementById('selectedTime').value = appState.selectedTime;
@@ -165,22 +158,22 @@ function showScreen(screenId) {
             setTimeout(() => s.style.display = 'none', 500);
         }
     });
-
 }
 
 function resetForm() {
     elements.bookingForm.reset();
     appState.selectedTime = null;
     appState.numGuests = 1;
+    document.getElementById('specialRequests').value = '';
     updateGuestUI();
     updateSlotsUI();
     showScreen('bookingPage');
 }
 
-// Data Handling
+// Form Submit
 async function handleFormSubmit(e) {
     e.preventDefault();
-    
+
     if (!appState.selectedDate) {
         elements.dateError.style.display = 'block';
         gsap.to(elements.tuesdaySelector, { x: 5, repeat: 5, yoyo: true, duration: 0.05 });
@@ -192,33 +185,44 @@ async function handleFormSubmit(e) {
         return;
     }
 
-    if (CONFIG.API_URL.includes("YOUR_DEPLOYMENT_ID")) {
-        alert("Please set your Google Apps Script Web App URL in app.js first. Instructions are in GOOGLE_SHEETS_SETUP.md.");
+    const termsAccepted = document.getElementById('termsAccepted').checked;
+    if (!termsAccepted) {
+        const termsSection = document.querySelector('.terms-section');
+        gsap.to(termsSection, { x: 5, repeat: 5, yoyo: true, duration: 0.05 });
+        termsSection.style.borderColor = 'rgba(200,6,19,0.5)';
+        setTimeout(() => termsSection.style.borderColor = '', 2000);
         return;
     }
+
+    const bookingRef = generateRef();
+    const manageUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}manage.html?ref=${bookingRef}`;
 
     const formData = {
         name: document.getElementById('custName').value,
         phone: document.getElementById('custPhone').value,
+        email: document.getElementById('custEmail').value,
         guests: appState.numGuests,
         time: appState.selectedTime,
-        date: appState.selectedDate
+        date: appState.selectedDate,
+        requests: document.getElementById('specialRequests').value || '',
+        ref: bookingRef,
+        manageUrl: manageUrl
     };
 
     try {
         setLoading(true);
-        const response = await fetch(CONFIG.API_URL, {
+        await fetch(CONFIG.API_URL, {
             method: 'POST',
-            mode: 'no-cors', // Apps Script requires no-cors for simple posts or complex CORS handling
+            mode: 'no-cors',
             body: JSON.stringify(formData),
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
 
-        // 'no-cors' means we won't see the response body, but we assume success if no error is thrown
+        // Show success screen with email + ref
+        document.getElementById('successEmail').textContent = formData.email;
+        document.getElementById('successRef').textContent = bookingRef;
         showScreen('successPage');
-        refreshData(); // background refresh
+        refreshData();
     } catch (err) {
         console.error("Booking failed:", err);
         alert("Something went wrong. Please check your connection to the flames.");
@@ -228,56 +232,32 @@ async function handleFormSubmit(e) {
 }
 
 async function refreshData() {
-    if (CONFIG.API_URL.includes("YOUR_DEPLOYMENT_ID")) return;
-    
-    // Add date filter to the fetch
     const url = new URL(CONFIG.API_URL);
-    if (appState.selectedDate) {
-        url.searchParams.set('date', appState.selectedDate);
-    }
+    if (appState.selectedDate) url.searchParams.set('date', appState.selectedDate);
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-        
         if (data.availability) {
-            // Update app slots state
             data.availability.forEach(slot => {
                 const match = appState.slots.find(s => s.time === slot.time);
                 if (match) match.booked = slot.totalBooked;
             });
             updateSlotsUI();
         }
-
     } catch (err) {
         console.error("Error refreshing data:", err);
     }
 }
 
-
 function setLoading(isLoading) {
     appState.loading = isLoading;
     elements.submitBtn.disabled = isLoading;
-    if (isLoading) {
-        elements.submitBtn.querySelector('.btn-text').style.opacity = '0';
-        elements.submitBtn.querySelector('.btn-loader').style.display = 'block';
-    } else {
-        elements.submitBtn.querySelector('.btn-text').style.opacity = '1';
-        elements.submitBtn.querySelector('.btn-loader').style.display = 'none';
-    }
+    elements.submitBtn.querySelector('.btn-text').style.opacity = isLoading ? '0' : '1';
+    elements.submitBtn.querySelector('.btn-loader').style.display = isLoading ? 'block' : 'none';
 }
 
-function copyShareLink() {
-    const url = window.location.href.split('?')[0];
-    navigator.clipboard.writeText(url).then(() => {
-        alert("Shareable booking link copied to clipboard!");
-    });
-}
-
-// Initial Call
+// Initial
 refreshData();
 updateSlotsUI();
-
-// Intro Animation
-gsap.from(".logo-text", { y: -50, opacity: 0, duration: 1.5, ease: "power4.out" });
-gsap.from(".container", { y: 100, opacity: 0, duration: 1.2, delay: 0.5, ease: "power3.out" });
+gsap.from(".container", { y: 100, opacity: 0, duration: 1.2, delay: 0.3, ease: "power3.out" });

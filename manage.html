@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELL PIZZA | Manage Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Bebas+Neue&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --hell-red: #C80613;
+            --hell-bone: #E1D8B7;
+            --hell-black: #151515;
+            --font-heading: 'Bebas Neue', cursive;
+            --font-display: 'Pirata One', cursive;
+            --font-body: 'Roboto', sans-serif;
+            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: #151515;
+            color: #E1D8B7;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            letter-spacing: 0.02em;
+        }
+
+        .texture-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+            background-repeat: repeat;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 4rem auto;
+            padding: 3rem;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(225, 216, 183, 0.1);
+            border-radius: 4px;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 60%; height: 50%;
+            background: #C80613;
+            filter: blur(120px);
+            opacity: 0.08;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .container > * { position: relative; z-index: 1; }
+
+        .page-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3rem;
+            letter-spacing: 0.05em;
+            line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: #C80613;
+            text-transform: uppercase;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Loading state */
+        #loadingState { text-align: center; padding: 3rem 0; }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(225,216,183,0.1);
+            border-top-color: #C80613;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.4;
+        }
+
+        /* Booking details card */
+        #bookingDetails { display: none; }
+
+        .booking-card {
+            border: 1px solid rgba(225,216,183,0.1);
+            background: rgba(225,216,183,0.02);
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .booking-card-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #C80613;
+            margin-bottom: 1.2rem;
+        }
+
+        .booking-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(225,216,183,0.05);
+            font-size: 0.88rem;
+        }
+
+        .booking-detail-row:last-child { border-bottom: none; }
+
+        .detail-key {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.4;
+        }
+
+        .detail-val {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Sections */
+        .section-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8rem;
+            letter-spacing: 0.08em;
+            margin-bottom: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        /* Date selector */
+        .date-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .selector-btn {
+            padding: 1.2rem;
+            background: transparent;
+            border: 1px solid rgba(225,216,183,0.3);
+            color: #E1D8B7;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            border-radius: 0;
+            text-transform: uppercase;
+        }
+        .selector-btn .date-day { display: block; font-size: 1.2rem; font-weight: 700; }
+        .selector-btn .date-month { display: block; font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.1em; }
+        .selector-btn.active { background: #C80613; border-color: #C80613; color: #151515; }
+        .selector-btn.active .date-month { color: #151515; opacity: 0.8; }
+        .selector-btn.current-booking { border-color: rgba(225,216,183,0.6); }
+
+        /* Time selector */
+        .time-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; }
+
+        .time-btn {
+            padding: 1.2rem;
+            background: transparent;
+            border: 1px solid rgba(225,216,183,0.2);
+            color: #E1D8B7;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-family: 'Pirata One', cursive;
+            font-size: 1.5rem;
+        }
+        .time-btn.active { background: #C80613; border-color: #C80613; color: #151515; }
+        .time-btn:hover:not(.active) { border-color: #C80613; }
+
+        /* Action buttons */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: #C80613;
+            border: 1px solid #C80613;
+            color: #151515;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.4rem;
+            letter-spacing: 0.08em;
+            padding: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            width: 100%;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid rgba(200,6,19,0.35);
+            color: #C80613;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.4rem;
+            letter-spacing: 0.08em;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .btn-danger:hover { background: rgba(200,6,19,0.1); border-color: #C80613; }
+
+        /* Error / not found */
+        #errorState { display: none; text-align: center; padding: 3rem 0; }
+        .error-icon { font-size: 2rem; margin-bottom: 1rem; opacity: 0.4; }
+        .error-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.5rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .error-msg { font-size: 0.85rem; opacity: 0.5; line-height: 1.6; }
+
+        /* Success states */
+        #successState, #cancelledState { display: none; text-align: center; padding: 3rem 0; }
+
+        .result-icon {
+            width: 70px; height: 70px;
+            color: #C80613;
+            margin: 0 auto 1.5rem;
+            filter: drop-shadow(0 0 12px rgba(200,6,19,0.3));
+        }
+
+        .result-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3rem;
+            letter-spacing: 0.05em;
+            line-height: 1;
+            margin-bottom: 0.8rem;
+        }
+
+        .result-msg { font-size: 0.88rem; opacity: 0.55; line-height: 1.6; }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: #C80613;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(200,6,19,0.3);
+            padding-bottom: 2px;
+            transition: border-color 0.2s;
+        }
+        .back-link:hover { border-color: #C80613; }
+
+        @media (max-width: 600px) {
+            .container { margin: 1rem; padding: 1.8rem; }
+            .action-row { grid-template-columns: 1fr; }
+            .time-selector { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="texture-overlay"></div>
+
+    <main class="container">
+        <h1 class="page-title">MANAGE BOOKING</h1>
+        <p class="page-sub">Hell Pizza Bond St &mdash; All You Can Eat Tuesday</p>
+
+        <!-- Loading -->
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <p class="loading-text">Fetching your booking...</p>
+        </div>
+
+        <!-- Error / not found -->
+        <div id="errorState">
+            <div class="error-icon">☠</div>
+            <h2 class="error-title">BOOKING NOT FOUND</h2>
+            <p class="error-msg">We couldn't find a booking with that reference.<br>Please check your confirmation email and try again.</p>
+            <a href="index.html" class="back-link">← MAKE A NEW BOOKING</a>
+        </div>
+
+        <!-- Booking details + change form -->
+        <div id="bookingDetails">
+            <div class="booking-card">
+                <div class="booking-card-label">Your Current Booking</div>
+                <div class="booking-detail-row">
+                    <span class="detail-key">Reference</span>
+                    <span class="detail-val" id="detailRef">—</span>
+                </div>
+                <div class="booking-detail-row">
+                    <span class="detail-key">Name</span>
+                    <span class="detail-val" id="detailName">—</span>
+                </div>
+                <div class="booking-detail-row">
+                    <span class="detail-key">Date</span>
+                    <span class="detail-val" id="detailDate">—</span>
+                </div>
+                <div class="booking-detail-row">
+                    <span class="detail-key">Time</span>
+                    <span class="detail-val" id="detailTime">—</span>
+                </div>
+                <div class="booking-detail-row">
+                    <span class="detail-key">Guests</span>
+                    <span class="detail-val" id="detailGuests">—</span>
+                </div>
+            </div>
+
+            <div class="section-title">CHANGE SESSION</div>
+
+            <div class="date-selector-grid" id="manageDateSelector"></div>
+
+            <div class="time-selector" id="manageTimeSelector">
+                <button class="time-btn" data-time="5:30">5:30 PM</button>
+                <button class="time-btn" data-time="6:00">6:00 PM</button>
+                <button class="time-btn" data-time="6:30">6:30 PM</button>
+            </div>
+
+            <div class="action-row">
+                <button class="btn-primary" id="saveChangeBtn" onclick="saveChange()">SAVE CHANGES</button>
+                <button class="btn-danger" onclick="cancelBooking()">CANCEL BOOKING</button>
+            </div>
+        </div>
+
+        <!-- Changed successfully -->
+        <div id="successState">
+            <i data-lucide="check-circle" class="result-icon"></i>
+            <h2 class="result-title">BOOKING UPDATED</h2>
+            <p class="result-msg">Your booking has been changed.<br>A confirmation email is on its way.</p>
+            <a href="index.html" class="back-link">← BACK TO BOOKINGS</a>
+        </div>
+
+        <!-- Cancelled -->
+        <div id="cancelledState">
+            <i data-lucide="x-circle" class="result-icon" style="color: rgba(225,216,183,0.4); filter: none;"></i>
+            <h2 class="result-title">BOOKING CANCELLED</h2>
+            <p class="result-msg">Your booking has been removed.<br>We hope to see you another Tuesday.</p>
+            <a href="index.html" class="back-link">← MAKE A NEW BOOKING</a>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec";
+        const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+        const FULL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+        let manageState = {
+            ref: null,
+            booking: null,
+            selectedDate: null,
+            selectedTime: null
+        };
+
+        lucide.createIcons();
+
+        // Read ref from URL
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            manageState.ref = params.get('ref');
+
+            if (!manageState.ref) {
+                showState('errorState');
+                return;
+            }
+
+            loadBooking();
+        }
+
+        async function loadBooking() {
+            showState('loadingState');
+            try {
+                const url = new URL(API_URL);
+                url.searchParams.set('ref', manageState.ref);
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (!data.booking) {
+                    showState('errorState');
+                    return;
+                }
+
+                manageState.booking = data.booking;
+                manageState.selectedDate = data.booking.date;
+                manageState.selectedTime = data.booking.time;
+
+                populateDetails(data.booking);
+                buildDateSelector();
+                updateTimeBtns();
+                showState('bookingDetails');
+            } catch (err) {
+                console.error(err);
+                showState('errorState');
+            }
+        }
+
+        function populateDetails(b) {
+            document.getElementById('detailRef').textContent = b.ref || manageState.ref;
+            document.getElementById('detailName').textContent = b.name;
+            document.getElementById('detailGuests').textContent = b.guests + ' ' + (b.guests === 1 ? 'person' : 'people');
+            document.getElementById('detailTime').textContent = b.time + ' PM';
+
+            // Format date nicely
+            const d = new Date(b.date + 'T12:00:00');
+            document.getElementById('detailDate').textContent = `Tuesday ${d.getDate()} ${FULL_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function buildDateSelector() {
+            const selector = document.getElementById('manageDateSelector');
+            selector.innerHTML = '';
+
+            let date = new Date();
+            date.setDate(date.getDate() + (7 - date.getDay() + 2) % 7);
+            if (new Date().getDay() === 2 && new Date().getHours() >= 20) date.setDate(date.getDate() + 7);
+
+            for (let i = 0; i < 4; i++) {
+                const d = new Date(date);
+                const dateStr = d.toISOString().split('T')[0];
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'selector-btn';
+                if (dateStr === manageState.selectedDate) btn.classList.add('active');
+                if (dateStr === manageState.booking.date) btn.classList.add('current-booking');
+
+                btn.innerHTML = `
+                    <span class="date-day">${d.getDate()}</span>
+                    <span class="date-month">${MONTHS[d.getMonth()]}</span>
+                `;
+
+                btn.onclick = () => {
+                    manageState.selectedDate = dateStr;
+                    selector.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+
+                selector.appendChild(btn);
+                date.setDate(date.getDate() + 7);
+            }
+        }
+
+        function updateTimeBtns() {
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.time === manageState.selectedTime);
+                btn.onclick = () => {
+                    manageState.selectedTime = btn.dataset.time;
+                    updateTimeBtns();
+                };
+            });
+        }
+
+        async function saveChange() {
+            const btn = document.getElementById('saveChangeBtn');
+            btn.disabled = true;
+            btn.textContent = 'SAVING...';
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: 'CHANGE',
+                        ref: manageState.ref,
+                        date: manageState.selectedDate,
+                        time: manageState.selectedTime
+                    })
+                });
+                showState('successState');
+            } catch (err) {
+                alert('Something went wrong. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'SAVE CHANGES';
+            }
+        }
+
+        async function cancelBooking() {
+            if (!confirm('Are you sure you want to cancel your booking?')) return;
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: 'DELETE',
+                        ref: manageState.ref,
+                        timestamp: manageState.booking.timestamp
+                    })
+                });
+                showState('cancelledState');
+                lucide.createIcons();
+            } catch (err) {
+                alert('Something went wrong. Please try again.');
+            }
+        }
+
+        function showState(id) {
+            ['loadingState', 'errorState', 'bookingDetails', 'successState', 'cancelledState'].forEach(s => {
+                document.getElementById(s).style.display = s === id ? '' : 'none';
+            });
+            if (id === 'successState' || id === 'cancelledState') lucide.createIcons();
+        }
+
+        init();
+    </script>
+</body>
+</html>

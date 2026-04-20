@@ -132,6 +132,7 @@ body {
 
 input[type="text"], 
 input[type="tel"],
+input[type="email"],
 input[type="date"] {
     width: 100%;
     background: rgba(225, 216, 183, 0.03); 
