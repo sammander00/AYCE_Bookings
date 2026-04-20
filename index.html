@@ -11,12 +11,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        /* ── MAP ── */
-        .map-section {
-            grid-column: 1 / -1;
-            margin-bottom: 1.8rem;
-        }
-        .map-section label {
+        /* Map — sits flush under the date selector inside form-main */
+        .map-group { margin-bottom: 1.8rem; }
+
+        .map-group label {
             display: flex;
             align-items: center;
             gap: 0.6rem;
@@ -24,32 +22,36 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
             color: var(--hell-bone);
         }
-        .map-section label i { color: var(--hell-red); width: 18px; height: 18px; }
+        .map-group label i { color: var(--hell-red); width: 18px; height: 18px; }
+
         .map-address {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--hell-bone);
-            opacity: 0.5;
-            margin-bottom: 0.8rem;
-            letter-spacing: 0.05em;
-        }
-        .map-embed {
-            width: 100%;
-            height: 220px;
-            border: 1px solid rgba(225,216,183,0.12);
-            border-radius: 2px;
-            filter: grayscale(30%) contrast(1.1);
+            opacity: 0.45;
+            margin-bottom: 0.7rem;
+            letter-spacing: 0.04em;
         }
 
-        /* ── TERMS ── */
+        .map-embed {
+            width: 100%;
+            height: 200px;
+            border: 1px solid rgba(225,216,183,0.1);
+            border-radius: 2px;
+            display: block;
+            filter: grayscale(20%) contrast(1.05) brightness(0.9);
+        }
+
+        /* Terms */
         .terms-section {
             grid-column: 1 / -1;
             border: 1px solid rgba(225,216,183,0.1);
             background: rgba(225,216,183,0.02);
             padding: 1.4rem 1.6rem;
             margin-bottom: 1.8rem;
+            transition: border-color 0.3s;
         }
         .terms-heading {
             font-size: 0.75rem;
@@ -68,8 +70,7 @@
             font-size: 0.8rem;
             color: var(--hell-bone);
             opacity: 0.7;
-            padding: 0.3rem 0;
-            padding-left: 1.2rem;
+            padding: 0.3rem 0 0.3rem 1.2rem;
             position: relative;
             line-height: 1.4;
         }
@@ -78,12 +79,12 @@
             position: absolute;
             left: 0;
             color: var(--hell-red);
-            opacity: 0.7;
+            opacity: 0.8;
         }
         .terms-link {
             font-size: 0.75rem;
             color: var(--hell-red);
-            opacity: 0.7;
+            opacity: 0.75;
             text-decoration: underline;
             text-underline-offset: 3px;
             transition: opacity 0.2s;
@@ -112,37 +113,30 @@
             line-height: 1.4;
         }
 
-        /* ── SUCCESS ── */
+        /* Success */
         .success-ref {
             font-size: 0.75rem;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.12em;
             color: var(--hell-bone);
             opacity: 0.45;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             text-transform: uppercase;
         }
-        .success-ref span {
-            color: var(--hell-red);
-            opacity: 1;
-            font-weight: 700;
-        }
+        .success-ref span { color: var(--hell-red); opacity: 1; font-weight: 700; }
 
-        /* ── BTN LOADER ── */
+        /* Loader */
         .btn-loader {
             display: none;
-            width: 24px;
-            height: 24px;
+            width: 24px; height: 24px;
             border: 3px solid rgba(21,21,21,0.3);
             border-top-color: #151515;
             border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin: 0 auto;
+            animation: btnSpin 0.7s linear infinite;
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
         }
-        @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+        @keyframes btnSpin { to { transform: translate(-50%,-50%) rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -156,12 +150,28 @@
             </div>
 
             <form id="bookingForm" class="booking-grid">
+
+                <!-- LEFT COLUMN -->
                 <div class="form-main">
+
                     <div class="input-group">
                         <label><i data-lucide="calendar"></i> Select Tuesday Session</label>
                         <div class="date-selector-grid" id="tuesdaySelector"></div>
                         <input type="hidden" id="sessionDate" required>
                         <div id="dateError" class="error-msg">PLEASE SELECT A TUESDAY SESSION.</div>
+                    </div>
+
+                    <!-- MAP under date selector -->
+                    <div class="map-group">
+                        <label><i data-lucide="map-pin"></i> Where to Find Us</label>
+                        <p class="map-address">14 Bond Street, Te Aro, Wellington</p>
+                        <iframe
+                            class="map-embed"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU2Q8I&q=14+Bond+Street,Te+Aro,Wellington,New+Zealand&zoom=16"
+                            allowfullscreen>
+                        </iframe>
                     </div>
 
                     <div class="input-group">
@@ -187,47 +197,36 @@
                             <i data-lucide="info" size="14"></i> For bookings over 15 people, please call the store on 04 473 5186
                         </div>
                     </div>
+
                 </div>
 
+                <!-- RIGHT COLUMN -->
                 <div class="form-slots">
                     <label><i data-lucide="clock"></i> Choose Arrival Time</label>
                     <div class="slots-container" id="slotsContainer">
                         <button type="button" class="slot-btn" data-time="5:30">
                             <span class="time">5:30 PM</span>
-                            <span class="availability">UPDATING...</span>
+                            <span class="availability">LOADING...</span>
                         </button>
                         <button type="button" class="slot-btn" data-time="6:00">
                             <span class="time">6:00 PM</span>
-                            <span class="availability">UPDATING...</span>
+                            <span class="availability">LOADING...</span>
                         </button>
                         <button type="button" class="slot-btn" data-time="6:30">
                             <span class="time">6:30 PM</span>
-                            <span class="availability">UPDATING...</span>
+                            <span class="availability">LOADING...</span>
                         </button>
                     </div>
                     <input type="hidden" id="selectedTime" required>
                 </div>
 
+                <!-- FULL WIDTH: special requests -->
                 <div class="input-group" style="grid-column: 1 / -1;">
                     <label><i data-lucide="message-square"></i> Special Requests <span style="opacity:0.4; font-weight:400; font-style:italic; text-transform:none; letter-spacing:0">(optional)</span></label>
                     <textarea id="specialRequests" placeholder="Dietary requirements, accessibility needs, celebrations..." style="width:100%; background:rgba(225,216,183,0.03); border:1px solid rgba(225,216,183,0.15); border-radius:2px; padding:1.2rem; color:var(--hell-bone); font-size:1rem; font-family:var(--font-body); resize:vertical; min-height:90px; transition:all 0.3s var(--transition);"></textarea>
                 </div>
 
-<<<<<<< HEAD
-                <!-- GOOGLE MAP -->
-                <div class="map-section">
-                    <label><i data-lucide="map-pin"></i> Where to Find Us</label>
-                    <p class="map-address">14 Bond Street, Te Aro, Wellington</p>
-                    <iframe
-                        class="map-embed"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU2Q8I&q=14+Bond+Street,Te+Aro,Wellington,New+Zealand&zoom=16"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-
-                <!-- TERMS & CONDITIONS -->
+                <!-- FULL WIDTH: T&Cs -->
                 <div class="terms-section">
                     <div class="terms-heading">Terms &amp; Conditions</div>
                     <ul class="terms-list">
@@ -242,8 +241,7 @@
                     </label>
                 </div>
 
-=======
->>>>>>> 86aee33ff29998490181b528df4d4b5b13a5d0d7
+                <!-- FULL WIDTH: submit -->
                 <div class="form-footer">
                     <button type="submit" class="submit-btn" id="submitBtn">
                         <span class="btn-text">RESERVE MY TICKET/S</span>
@@ -251,6 +249,7 @@
                     </button>
                     <p class="terms">All Tuesday evening sessions end at 8:00pm latest. Please eat responsibly.</p>
                 </div>
+
             </form>
         </div>
 
@@ -259,8 +258,8 @@
                 <i data-lucide="check-circle" class="success-icon"></i>
                 <h2 class="display-text">YOU'RE IN</h2>
                 <p>Your table is secured. See you in HELL.</p>
-                <p class="success-ref">A confirmation email has been sent to <span id="successEmail"></span></p>
-                <p class="success-ref" style="margin-top:0.4rem;">Booking ref: <span id="successRef"></span></p>
+                <p class="success-ref">Confirmation sent to <span id="successEmail"></span></p>
+                <p class="success-ref">Booking ref: <span id="successRef"></span></p>
                 <button type="button" class="hell-btn-alt" onclick="resetForm()">MAKE ANOTHER BOOKING</button>
             </div>
         </div>

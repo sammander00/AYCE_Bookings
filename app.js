@@ -4,7 +4,6 @@ const CONFIG = {
     CAPACITY_PER_SLOT: 30
 };
 
-// State
 let appState = {
     currentScreen: 'bookingPage',
     numGuests: 1,
@@ -19,7 +18,6 @@ let appState = {
     loading: false
 };
 
-// Generate a unique booking reference (e.g. HELL-A3F9)
 function generateRef() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let ref = 'HELL-';
@@ -27,10 +25,8 @@ function generateRef() {
     return ref;
 }
 
-// Initialize Lucide Icons
 lucide.createIcons();
 
-// Elements
 const elements = {
     bookingForm: document.getElementById('bookingForm'),
     guestSelector: document.getElementById('guestSelector'),
@@ -42,7 +38,7 @@ const elements = {
     submitBtn: document.getElementById('submitBtn')
 };
 
-// Initialize Date Picker
+// Initialize Date Picker — auto-selects first Tuesday and immediately fetches availability
 function initDatePicker() {
     const selector = elements.tuesdaySelector;
     selector.innerHTML = '';
@@ -54,6 +50,8 @@ function initDatePicker() {
     }
 
     const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+    let firstBtn = null;
+    let firstDateStr = null;
 
     for (let i = 0; i < 4; i++) {
         const d = new Date(date);
@@ -77,7 +75,21 @@ function initDatePicker() {
         };
 
         selector.appendChild(btn);
+
+        if (i === 0) {
+            firstBtn = btn;
+            firstDateStr = dateStr;
+        }
+
         date.setDate(date.getDate() + 7);
+    }
+
+    // Auto-select the first Tuesday and fetch real availability straight away
+    if (firstBtn) {
+        firstBtn.classList.add('active');
+        appState.selectedDate = firstDateStr;
+        elements.sessionDate.value = firstDateStr;
+        refreshData();
     }
 }
 initDatePicker();
@@ -101,7 +113,6 @@ function initGuestSelector() {
 }
 initGuestSelector();
 
-// Event Listeners
 elements.bookingForm.addEventListener('submit', handleFormSubmit);
 
 elements.slotBtns.forEach(btn => {
@@ -113,7 +124,6 @@ elements.slotBtns.forEach(btn => {
     });
 });
 
-// UI Functions
 function updateGuestUI() {
     const btns = elements.guestSelector.querySelectorAll('button');
     btns.forEach(btn => {
@@ -164,13 +174,14 @@ function resetForm() {
     elements.bookingForm.reset();
     appState.selectedTime = null;
     appState.numGuests = 1;
+    appState.slots.forEach(s => s.booked = 0);
     document.getElementById('specialRequests').value = '';
     updateGuestUI();
     updateSlotsUI();
     showScreen('bookingPage');
+    initDatePicker();
 }
 
-// Form Submit
 async function handleFormSubmit(e) {
     e.preventDefault();
 
@@ -204,13 +215,9 @@ async function handleFormSubmit(e) {
         guests: appState.numGuests,
         time: appState.selectedTime,
         date: appState.selectedDate,
-<<<<<<< HEAD
         requests: document.getElementById('specialRequests').value || '',
         ref: bookingRef,
         manageUrl: manageUrl
-=======
-        requests: document.getElementById('specialRequests').value || ''
->>>>>>> 86aee33ff29998490181b528df4d4b5b13a5d0d7
     };
 
     try {
@@ -222,7 +229,6 @@ async function handleFormSubmit(e) {
             headers: { 'Content-Type': 'application/json' }
         });
 
-        // Show success screen with email + ref
         document.getElementById('successEmail').textContent = formData.email;
         document.getElementById('successRef').textContent = bookingRef;
         showScreen('successPage');
@@ -236,22 +242,30 @@ async function handleFormSubmit(e) {
 }
 
 async function refreshData() {
-    const url = new URL(CONFIG.API_URL);
-    if (appState.selectedDate) url.searchParams.set('date', appState.selectedDate);
+    if (!appState.selectedDate) return;
+
+    // Show "LOADING..." in slot availability while fetching
+    elements.slotBtns.forEach(btn => {
+        btn.querySelector('.availability').textContent = 'LOADING...';
+    });
 
     try {
+        const url = new URL(CONFIG.API_URL);
+        url.searchParams.set('date', appState.selectedDate);
         const response = await fetch(url);
         const data = await response.json();
+
         if (data.availability) {
             data.availability.forEach(slot => {
                 const match = appState.slots.find(s => s.time === slot.time);
                 if (match) match.booked = slot.totalBooked;
             });
-            updateSlotsUI();
         }
     } catch (err) {
         console.error("Error refreshing data:", err);
     }
+
+    updateSlotsUI();
 }
 
 function setLoading(isLoading) {
@@ -261,7 +275,5 @@ function setLoading(isLoading) {
     elements.submitBtn.querySelector('.btn-loader').style.display = isLoading ? 'block' : 'none';
 }
 
-// Initial
-refreshData();
 updateSlotsUI();
 gsap.from(".container", { y: 100, opacity: 0, duration: 1.2, delay: 0.3, ease: "power3.out" });
