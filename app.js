@@ -14,7 +14,6 @@ let appState = {
         { time: '6:00', booked: 0, capacity: 30 },
         { time: '6:30', booked: 0, capacity: 30 }
     ],
-    bookings: [],
     loading: false
 };
 
@@ -23,6 +22,14 @@ function generateRef() {
     let ref = 'HELL-';
     for (let i = 0; i < 6; i++) ref += chars[Math.floor(Math.random() * chars.length)];
     return ref;
+}
+
+// Timezone-safe date string — avoids UTC conversion shifting the day in NZ (UTC+12/13)
+function localDateStr(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return yyyy + '-' + mm + '-' + dd;
 }
 
 lucide.createIcons();
@@ -38,41 +45,52 @@ const elements = {
     submitBtn: document.getElementById('submitBtn')
 };
 
-// Initialize Date Picker — auto-selects first Tuesday and immediately fetches availability
+// Initialize Date Picker
 function initDatePicker() {
     const selector = elements.tuesdaySelector;
     selector.innerHTML = '';
 
-    let date = new Date();
-    date.setDate(date.getDate() + (7 - date.getDay() + 2) % 7);
-    if (new Date().getDay() === 2 && new Date().getHours() >= 20) {
-        date.setDate(date.getDate() + 7);
-    }
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 Sun … 2 Tue … 6 Sat
+    const hour = now.getHours();
+
+    // Days until the next Tuesday.
+    // If today IS Tuesday and before 8 pm, offset = 0 (show today).
+    // If today IS Tuesday at/after 8 pm, jump 7 days.
+    let offset = (2 - dayOfWeek + 7) % 7;
+    if (offset === 0 && hour >= 20) offset = 7;
+
+    // Use noon local time to avoid any DST edge cases
+    let base = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12, 0, 0);
 
     const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
     let firstBtn = null;
     let firstDateStr = null;
 
     for (let i = 0; i < 4; i++) {
-        const d = new Date(date);
-        const dateStr = d.toISOString().split('T')[0];
+        const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + (i * 7), 12, 0, 0);
+        const dateStr = localDateStr(d);
 
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'selector-btn';
-        btn.innerHTML = `
-            <span class="date-day">${d.getDate()}</span>
-            <span class="date-month">${months[d.getMonth()]}</span>
-        `;
+        btn.innerHTML =
+            '<span class="date-day">' + d.getDate() + '</span>' +
+            '<span class="date-month">' + months[d.getMonth()] + '</span>';
 
-        btn.onclick = () => {
-            appState.selectedDate = dateStr;
-            elements.sessionDate.value = dateStr;
-            selector.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            elements.dateError.style.display = 'none';
-            refreshData();
-        };
+        btn.onclick = (function(ds) {
+            return function() {
+                appState.selectedDate = ds;
+                elements.sessionDate.value = ds;
+                selector.querySelectorAll('.selector-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                elements.dateError.style.display = 'none';
+                // Reset slot counts when switching date
+                appState.slots.forEach(function(s) { s.booked = 0; });
+                updateSlotsUI();
+                refreshData();
+            };
+        })(dateStr);
 
         selector.appendChild(btn);
 
@@ -80,11 +98,9 @@ function initDatePicker() {
             firstBtn = btn;
             firstDateStr = dateStr;
         }
-
-        date.setDate(date.getDate() + 7);
     }
 
-    // Auto-select the first Tuesday and fetch real availability straight away
+    // Auto-select first Tuesday and fetch immediately
     if (firstBtn) {
         firstBtn.classList.add('active');
         appState.selectedDate = firstDateStr;
@@ -97,17 +113,19 @@ initDatePicker();
 // Generate 15 Guest Buttons
 function initGuestSelector() {
     elements.guestSelector.innerHTML = '';
-    for (let i = 1; i <= 15; i++) {
-        const btn = document.createElement('button');
+    for (var i = 1; i <= 15; i++) {
+        var btn = document.createElement('button');
         btn.type = 'button';
         btn.dataset.val = i;
         btn.textContent = i;
         btn.classList.toggle('active', i === appState.numGuests);
-        btn.onclick = (e) => {
-            appState.numGuests = parseInt(e.currentTarget.dataset.val);
-            updateGuestUI();
-            updateSlotsUI();
-        };
+        btn.onclick = (function(val) {
+            return function() {
+                appState.numGuests = val;
+                updateGuestUI();
+                updateSlotsUI();
+            };
+        })(i);
         elements.guestSelector.appendChild(btn);
     }
 }
@@ -115,9 +133,9 @@ initGuestSelector();
 
 elements.bookingForm.addEventListener('submit', handleFormSubmit);
 
-elements.slotBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const time = e.currentTarget.dataset.time;
+elements.slotBtns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        var time = e.currentTarget.dataset.time;
         if (e.currentTarget.classList.contains('disabled')) return;
         appState.selectedTime = time;
         updateSlotsUI();
@@ -125,47 +143,46 @@ elements.slotBtns.forEach(btn => {
 });
 
 function updateGuestUI() {
-    const btns = elements.guestSelector.querySelectorAll('button');
-    btns.forEach(btn => {
+    elements.guestSelector.querySelectorAll('button').forEach(function(btn) {
         btn.classList.toggle('active', parseInt(btn.dataset.val) === appState.numGuests);
     });
     document.getElementById('numGuests').value = appState.numGuests;
 }
 
 function updateSlotsUI() {
-    elements.slotBtns.forEach(btn => {
-        const time = btn.dataset.time;
-        const slot = appState.slots.find(s => s.time === time);
-        const remaining = slot ? (slot.capacity - slot.booked) : 30;
-        const availText = btn.querySelector('.availability');
+    elements.slotBtns.forEach(function(btn) {
+        var time = btn.dataset.time;
+        var slot = appState.slots.find(function(s) { return s.time === time; });
+        var remaining = slot ? (slot.capacity - slot.booked) : 30;
+        var availText = btn.querySelector('.availability');
 
         if (remaining <= 0) {
             btn.classList.add('disabled');
             btn.classList.remove('active', 'urgent');
-            availText.textContent = "SOLD OUT";
+            availText.textContent = 'SOLD OUT';
         } else {
             btn.classList.remove('disabled');
-            availText.textContent = `${remaining} SEATS LEFT`;
+            availText.textContent = remaining + ' SEATS LEFT';
             btn.classList.toggle('urgent', remaining <= 10);
             if (remaining < appState.numGuests) {
                 btn.classList.add('disabled');
-                availText.textContent = `NEED ${appState.numGuests} SEATS`;
+                availText.textContent = 'NEED ' + appState.numGuests + ' SEATS';
             }
         }
 
         btn.classList.toggle('active', appState.selectedTime === time);
     });
-    document.getElementById('selectedTime').value = appState.selectedTime;
+    document.getElementById('selectedTime').value = appState.selectedTime || '';
 }
 
 function showScreen(screenId) {
-    elements.screens.forEach(s => {
+    elements.screens.forEach(function(s) {
         if (s.id === screenId) {
             s.style.display = 'block';
-            setTimeout(() => s.classList.add('active'), 10);
+            setTimeout(function() { s.classList.add('active'); }, 10);
         } else {
             s.classList.remove('active');
-            setTimeout(() => s.style.display = 'none', 500);
+            setTimeout(function() { s.style.display = 'none'; }, 500);
         }
     });
 }
@@ -174,7 +191,7 @@ function resetForm() {
     elements.bookingForm.reset();
     appState.selectedTime = null;
     appState.numGuests = 1;
-    appState.slots.forEach(s => s.booked = 0);
+    appState.slots.forEach(function(s) { s.booked = 0; });
     document.getElementById('specialRequests').value = '';
     updateGuestUI();
     updateSlotsUI();
@@ -196,19 +213,19 @@ async function handleFormSubmit(e) {
         return;
     }
 
-    const termsAccepted = document.getElementById('termsAccepted').checked;
+    var termsAccepted = document.getElementById('termsAccepted').checked;
     if (!termsAccepted) {
-        const termsSection = document.querySelector('.terms-section');
+        var termsSection = document.querySelector('.terms-section');
         gsap.to(termsSection, { x: 5, repeat: 5, yoyo: true, duration: 0.05 });
         termsSection.style.borderColor = 'rgba(200,6,19,0.5)';
-        setTimeout(() => termsSection.style.borderColor = '', 2000);
+        setTimeout(function() { termsSection.style.borderColor = ''; }, 2000);
         return;
     }
 
-    const bookingRef = generateRef();
-    const manageUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}manage.html?ref=${bookingRef}`;
+    var bookingRef = generateRef();
+    var manageUrl = window.location.href.replace(/\/[^\/]*$/, '/') + 'manage.html?ref=' + bookingRef;
 
-    const formData = {
+    var formData = {
         name: document.getElementById('custName').value,
         phone: document.getElementById('custPhone').value,
         email: document.getElementById('custEmail').value,
@@ -234,8 +251,8 @@ async function handleFormSubmit(e) {
         showScreen('successPage');
         refreshData();
     } catch (err) {
-        console.error("Booking failed:", err);
-        alert("Something went wrong. Please check your connection to the flames.");
+        console.error('Booking failed:', err);
+        alert('Something went wrong. Please check your connection to the flames.');
     } finally {
         setLoading(false);
     }
@@ -244,25 +261,24 @@ async function handleFormSubmit(e) {
 async function refreshData() {
     if (!appState.selectedDate) return;
 
-    // Show "LOADING..." in slot availability while fetching
-    elements.slotBtns.forEach(btn => {
+    elements.slotBtns.forEach(function(btn) {
         btn.querySelector('.availability').textContent = 'LOADING...';
     });
 
     try {
-        const url = new URL(CONFIG.API_URL);
+        var url = new URL(CONFIG.API_URL);
         url.searchParams.set('date', appState.selectedDate);
-        const response = await fetch(url);
-        const data = await response.json();
+        var response = await fetch(url);
+        var data = await response.json();
 
         if (data.availability) {
-            data.availability.forEach(slot => {
-                const match = appState.slots.find(s => s.time === slot.time);
+            data.availability.forEach(function(slot) {
+                var match = appState.slots.find(function(s) { return s.time === slot.time; });
                 if (match) match.booked = slot.totalBooked;
             });
         }
     } catch (err) {
-        console.error("Error refreshing data:", err);
+        console.error('Error refreshing data:', err);
     }
 
     updateSlotsUI();
@@ -276,4 +292,4 @@ function setLoading(isLoading) {
 }
 
 updateSlotsUI();
-gsap.from(".container", { y: 100, opacity: 0, duration: 1.2, delay: 0.3, ease: "power3.out" });
+gsap.from('.container', { y: 100, opacity: 0, duration: 1.2, delay: 0.3, ease: 'power3.out' });
