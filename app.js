@@ -172,6 +172,7 @@ function resetForm() {
     elements.bookingForm.reset();
     appState.selectedTime = null;
     appState.numGuests = 1;
+    document.getElementById('specialRequests').value = '';
     updateGuestUI();
     updateSlotsUI();
     showScreen('bookingPage');
@@ -202,7 +203,8 @@ async function handleFormSubmit(e) {
         phone: document.getElementById('custPhone').value,
         guests: appState.numGuests,
         time: appState.selectedTime,
-        date: appState.selectedDate
+        date: appState.selectedDate,
+        requests: document.getElementById('specialRequests').value || ''
     };
 
     try {

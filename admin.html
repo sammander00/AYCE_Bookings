@@ -3,99 +3,920 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HELL PIZZA | Admin Portal</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>HELL PIZZA | Staff Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Bebas+Neue&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ── RESET & ROOT ── */
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pirata+One&family=Roboto:wght@300;400;700;900&display=swap');
+
+        :root {
+            --hell-red: #C80613;
+            --hell-bone: #E1D8B7;
+            --hell-black: #151515;
+            --font-heading: 'Bebas Neue', cursive;
+            --font-display: 'Pirata One', cursive;
+            --font-body: 'Roboto', sans-serif;
+            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: #151515;
+            color: #E1D8B7;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            letter-spacing: 0.02em;
+        }
+
+        .texture-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+            background-repeat: repeat;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── MAIN CONTAINER ── */
+        .admin-wrap {
+            max-width: 1100px;
+            margin: 4rem auto;
+            padding: 3rem;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(225, 216, 183, 0.1);
+            border-radius: 4px;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .admin-wrap::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 70%; height: 50%;
+            background: #C80613;
+            filter: blur(120px);
+            opacity: 0.09;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .admin-wrap > * { position: relative; z-index: 1; }
+
+        /* ── TOPBAR ── */
+        .admin-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(225, 216, 183, 0.1);
+        }
+
+        .topbar-brand {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.6rem;
+            letter-spacing: 0.2em;
+            color: #E1D8B7;
+        }
+        .topbar-brand span { color: #C80613; }
+
+        .topbar-link {
+            background: none;
+            border: 1px solid rgba(225,216,183,0.15);
+            color: #E1D8B7;
+            padding: 0.5rem 1.2rem;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 0.95rem;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .topbar-link:hover { border-color: #C80613; color: #C80613; }
+
+        /* ── HOME VIEW ── */
+        .home-heading { margin-bottom: 2.5rem; }
+
+        .home-heading h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.5rem;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            color: #E1D8B7;
+        }
+
+        .home-heading p {
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #C80613;
+            margin-top: 0.5rem;
+        }
+
+        .tuesday-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+        }
+
+        .tuesday-card {
+            border: 1px solid rgba(225,216,183,0.12);
+            background: rgba(225,216,183,0.02);
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tuesday-card::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: #C80613;
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.25s;
+        }
+
+        .tuesday-card:hover {
+            border-color: rgba(225,216,183,0.25);
+            background: rgba(225,216,183,0.045);
+            box-shadow: 0 0 30px rgba(200,6,19,0.1);
+        }
+        .tuesday-card:hover::after { transform: scaleY(1); }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.8rem;
+        }
+
+        .card-date { display: flex; align-items: baseline; gap: 0.7rem; }
+
+        .card-day-num {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 4.5rem;
+            line-height: 1;
+            color: #E1D8B7;
+        }
+
+        .card-date-detail { display: flex; flex-direction: column; }
+
+        .card-month {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 0.08em;
+            color: #E1D8B7;
+            opacity: 0.55;
+            line-height: 1.1;
+        }
+
+        .card-year {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: #E1D8B7;
+            opacity: 0.25;
+        }
+
+        .card-arrow {
+            color: #C80613;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            margin-top: 0.3rem;
+        }
+        .tuesday-card:hover .card-arrow { opacity: 1; transform: translateX(4px); }
+
+        .card-divider {
+            height: 1px;
+            background: rgba(225,216,183,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-bottom {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .card-total { display: flex; align-items: baseline; gap: 0.4rem; }
+
+        .card-total-num {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3rem;
+            line-height: 1;
+            color: #C80613;
+        }
+
+        .card-total-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #E1D8B7;
+            opacity: 0.35;
+        }
+
+        .card-slots-mini {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            align-items: flex-end;
+        }
+
+        .mini-slot {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #E1D8B7;
+            opacity: 0.28;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .mini-slot.active { opacity: 0.8; }
+
+        .mini-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #C80613;
+            opacity: 0.4;
+        }
+        .mini-slot.active .mini-dot { opacity: 1; }
+
+        .card-loading-text {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #E1D8B7;
+            opacity: 0.3;
+        }
+
+        /* ── SESSION VIEW ── */
+        #sessionView { display: none; }
+
+        .session-back {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: #E1D8B7;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        .session-back:hover { opacity: 1; }
+
+        .session-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(225,216,183,0.08);
+        }
+
+        .session-title h2 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.5rem;
+            letter-spacing: 0.06em;
+            line-height: 1;
+            color: #E1D8B7;
+        }
+
+        .session-title p {
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.25em;
+            color: #C80613;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .session-action-row { display: flex; gap: 0.8rem; }
+
+        .btn-outline {
+            background: none;
+            border: 1px solid rgba(225,216,183,0.18);
+            color: #E1D8B7;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            padding: 0.65rem 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-outline:hover { border-color: #C80613; color: #C80613; }
+
+        .btn-solid {
+            background: #C80613;
+            border: 1px solid #C80613;
+            color: #151515;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            padding: 0.65rem 1.3rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-solid:hover { opacity: 0.82; }
+
+        /* Slot groups */
+        .slot-group { margin-bottom: 2.5rem; }
+
+        .slot-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(225,216,183,0.08);
+            margin-bottom: 0.5rem;
+        }
+
+        .slot-group-title {
+            font-family: 'Pirata One', cursive;
+            font-size: 2rem;
+            color: #E1D8B7;
+        }
+
+        .slot-group-count {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #C80613;
+        }
+
+        .booking-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 60px 1.2fr auto;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0.8rem;
+            border-bottom: 1px solid rgba(225,216,183,0.05);
+            transition: background 0.12s;
+        }
+        .booking-row:hover { background: rgba(225,216,183,0.025); }
+
+        .booking-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #E1D8B7;
+        }
+
+        .booking-phone {
+            font-size: 0.82rem;
+            color: #E1D8B7;
+            opacity: 0.38;
+        }
+
+        .booking-guests-wrap { text-align: center; }
+
+        .booking-guests {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8rem;
+            color: #C80613;
+            line-height: 1;
+        }
+
+        .booking-guests-label {
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #E1D8B7;
+            opacity: 0.35;
+            text-transform: uppercase;
+            margin-top: -2px;
+        }
+
+        .booking-requests {
+            font-size: 0.78rem;
+            font-style: italic;
+            color: #E1D8B7;
+            opacity: 0.3;
+        }
+        .booking-requests.has-note { opacity: 0.75; }
+
+        .row-actions { display: flex; gap: 0.35rem; justify-content: flex-end; }
+
+        .icon-btn {
+            width: 30px; height: 30px;
+            background: none;
+            border: 1px solid rgba(225,216,183,0.1);
+            color: #E1D8B7;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            opacity: 0.5;
+        }
+        .icon-btn:hover { opacity: 1; border-color: #C80613; color: #C80613; }
+        .icon-btn.del:hover { border-color: #e05050; color: #e05050; }
+
+        .empty-slot {
+            padding: 1.8rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #E1D8B7;
+            opacity: 0.2;
+        }
+
+        /* ── EDIT MODAL ── */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal-backdrop.open { display: flex; }
+
+        .modal-box {
+            background: rgba(20, 20, 20, 0.98);
+            border: 1px solid rgba(225,216,183,0.12);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 460px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-box::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 60%; height: 40%;
+            background: #C80613;
+            filter: blur(80px);
+            opacity: 0.08;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .modal-box > * { position: relative; z-index: 1; }
+
+        .modal-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.2rem;
+            letter-spacing: 0.06em;
+            margin-bottom: 2rem;
+            color: #E1D8B7;
+        }
+
+        .modal-field { margin-bottom: 1.2rem; }
+
+        .modal-field label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #E1D8B7;
+            opacity: 0.5;
+            margin-bottom: 0.45rem;
+        }
+
+        .modal-field input,
+        .modal-field select,
+        .modal-field textarea {
+            width: 100%;
+            background: rgba(225,216,183,0.03);
+            border: 1px solid rgba(225, 216, 183, 0.15);
+            border-radius: 2px;
+            color: #E1D8B7;
+            padding: 1rem 1.2rem;
+            font-size: 0.95rem;
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s;
+        }
+        .modal-field select { background: #1a1a1a; }
+        .modal-field textarea { resize: vertical; min-height: 80px; }
+
+        .modal-field input:focus,
+        .modal-field select:focus,
+        .modal-field textarea:focus {
+            outline: none;
+            border-color: #C80613;
+            background: rgba(225, 216, 183, 0.07);
+            box-shadow: 0 0 10px rgba(200,6,19,0.2);
+        }
+
+        .modal-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-top: 1.8rem;
+        }
+
+        /* ── PRINT ── */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .texture-overlay, .admin-topbar, .session-back,
+            .session-action-row, .row-actions { display: none !important; }
+            .admin-wrap { border: none !important; background: white !important; box-shadow: none !important; margin: 0 !important; padding: 1rem !important; }
+            .admin-wrap::before { display: none !important; }
+            #homeView { display: none !important; }
+            #sessionView { display: block !important; }
+            .session-header { border-bottom: 2px solid #222; }
+            .session-title h2 { color: black; }
+            .session-title p { color: #C80613; }
+            .slot-group { page-break-inside: avoid; }
+            .slot-group-header { border-bottom: 2px solid #222; }
+            .slot-group-title { color: black; }
+            .slot-group-count { color: #C80613; }
+            .booking-row { border-bottom: 1px solid #ddd; grid-template-columns: 1.2fr 1fr 60px 1.5fr; }
+            .booking-name { color: black; }
+            .booking-phone { color: #666; opacity: 1; }
+            .booking-guests { color: #C80613; }
+            .booking-guests-label { color: #999; opacity: 1; }
+            .booking-requests { color: #444; opacity: 1; }
+            .booking-requests.has-note { color: #111; opacity: 1; }
+            .print-date-line { display: block !important; color: #999; font-size: 0.75rem; margin-bottom: 1.5rem; }
+        }
+
+        .print-date-line { display: none; }
+
+        @media (max-width: 800px) {
+            .tuesday-grid { grid-template-columns: 1fr; }
+            .admin-wrap { margin: 1rem; padding: 1.5rem; }
+            .session-header { flex-direction: column; align-items: flex-start; }
+            .booking-row { grid-template-columns: 1fr auto; row-gap: 0.3rem; }
+            .booking-requests, .row-actions { grid-column: 1 / -1; }
+        }
+
+        .spin { animation: adminSpin 0.7s linear infinite; }
+        @keyframes adminSpin { to { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="admin-body">
+<body>
     <div class="texture-overlay"></div>
-    
-    <main class="container shadow-bleed">
-        <div id="adminPage">
-            <div class="admin-header">
-                <h2 class="display-text">ADMIN PORTAL</h2>
-                <div class="admin-actions">
-                    <button onclick="refreshData()" class="action-btn"><i data-lucide="refresh-cw"></i></button>
-                    <button onclick="copyShareLink()" class="action-btn"><i data-lucide="link"></i></button>
-                    <a href="index.html" class="action-btn"><i data-lucide="home"></i></a>
+
+    <main class="admin-wrap">
+
+        <header class="admin-topbar">
+            <div class="topbar-brand">HELL <span>PIZZA</span> &mdash; STAFF</div>
+            <a href="index.html" class="topbar-link">
+                <i data-lucide="external-link" size="13"></i>
+                BOOKING FORM
+            </a>
+        </header>
+
+        <!-- HOME VIEW -->
+        <div id="homeView">
+            <div class="home-heading">
+                <h1>UPCOMING SESSIONS</h1>
+                <p>All You Can Eat Tuesday &mdash; Bond St</p>
+            </div>
+            <div class="tuesday-grid" id="tuesdayGrid"></div>
+        </div>
+
+        <!-- SESSION DETAIL VIEW -->
+        <div id="sessionView">
+            <button class="session-back" onclick="showHome()">
+                <i data-lucide="arrow-left" size="15"></i>
+                ALL SESSIONS
+            </button>
+
+            <div class="session-header">
+                <div class="session-title">
+                    <h2 id="sessionTitle">TUESDAY</h2>
+                    <p id="sessionSubtitle">LOADING...</p>
+                </div>
+                <div class="session-action-row">
+                    <button class="btn-outline" onclick="refreshSession()">
+                        <i data-lucide="refresh-cw" size="14" id="refreshIcon"></i>
+                        REFRESH
+                    </button>
+                    <button class="btn-outline" onclick="window.print()">
+                        <i data-lucide="printer" size="14"></i>
+                        PRINT LIST
+                    </button>
                 </div>
             </div>
 
-            <!-- Date selector for Admin to view different sessions -->
-            <div class="input-group">
-                <label><i data-lucide="calendar"></i> Select Session Date</label>
-                <div class="date-selector-grid" id="tuesdaySelector">
-                    <!-- JS will generate upcoming Tuesdays here -->
-                </div>
-            </div>
-            
-            <div id="adminStats" class="admin-stats">
-                <!-- Stats injected here -->
-            </div>
-
-            <div class="table-vessel">
-                <table id="bookingsTable">
-                    <thead>
-                        <tr>
-                            <th>TIME</th>
-                            <th>CUSTOMER</th>
-                            <th>GUESTS</th>
-                            <th>PHONE</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows injected here -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="loadingIndicator" style="display: none; text-align: center; margin-top: 2rem;">
-                <p class="subtitle">SUMMONING BOOKINGS...</p>
-            </div>
+            <p class="print-date-line" id="printDateLine"></p>
+            <div id="slotSections"></div>
         </div>
 
-        <!-- Hidden Edit Modal -->
-        <div id="editModal" class="screen" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 2rem;">
-            <div class="container" style="max-width: 500px; margin: 0;">
-                <h2 class="display-text" style="font-size: 3rem; margin-bottom: 2rem;">EDIT BOOKING</h2>
-                <form id="editForm">
-                    <input type="hidden" id="editTimestamp">
-                    <div class="input-group">
-                        <label>Customer Name</label>
-                        <input type="text" id="editName" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Phone Number</label>
-                        <input type="tel" id="editPhone" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Guest Count</label>
-                        <input type="number" id="editGuests" min="1" max="15" required style="width: 100%; padding: 1.2rem; background: rgba(225,216,183,0.03); border: 1px solid rgba(225,216,183,0.15); color: var(--hell-bone);">
-                    </div>
-                    <div class="input-group">
-                        <label>Arrival Time</label>
-                        <select id="editTime" style="width: 100%; padding: 1.2rem; background: #151515; border: 1px solid rgba(225,216,183,0.15); color: var(--hell-bone);">
-                            <option value="5:30">5:30 PM</option>
-                            <option value="6:00">6:00 PM</option>
-                            <option value="6:30">6:30 PM</option>
-                        </select>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;">
-                        <button type="submit" class="submit-btn" style="font-size: 1.5rem; padding: 1rem;">SAVE</button>
-                        <button type="button" class="hell-btn-alt" onclick="closeEditModal()" style="margin: 0; padding: 1rem;">CANCEL</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </main>
 
-    <footer class="site-footer">
-        <a href="https://order.hellpizza.nz" target="_blank">ORDER.HELLPIZZA.NZ</a>
-    </footer>
+    <!-- EDIT MODAL -->
+    <div class="modal-backdrop" id="editModal">
+        <div class="modal-box">
+            <h2 class="modal-title">EDIT BOOKING</h2>
+            <input type="hidden" id="editTimestamp">
+            <div class="modal-field">
+                <label>Name</label>
+                <input type="text" id="editName">
+            </div>
+            <div class="modal-field">
+                <label>Phone</label>
+                <input type="tel" id="editPhone">
+            </div>
+            <div class="modal-field">
+                <label>Guests</label>
+                <input type="number" id="editGuests" min="1" max="15">
+            </div>
+            <div class="modal-field">
+                <label>Arrival Time</label>
+                <select id="editTime">
+                    <option value="5:30">5:30 PM</option>
+                    <option value="6:00">6:00 PM</option>
+                    <option value="6:30">6:30 PM</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Special Requests</label>
+                <textarea id="editRequests" placeholder="Dietary needs, accessibility, etc."></textarea>
+            </div>
+            <div class="modal-btns">
+                <button class="btn-solid" onclick="saveEdit()">SAVE CHANGES</button>
+                <button class="btn-outline" onclick="closeEditModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
 
-    <script src="admin.js"></script>
+    <script>
+        const CONFIG = {
+            API_URL: "https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec",
+            SLOTS: ['5:30', '6:00', '6:30']
+        };
+
+        let state = { sessions: [], currentDate: null };
+        const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+        function getUpcomingTuesdays() {
+            const tuesdays = [];
+            let d = new Date();
+            const dayOfWeek = d.getDay();
+            let daysUntil = (2 - dayOfWeek + 7) % 7;
+            if (daysUntil === 0 && d.getHours() >= 20) daysUntil = 7;
+            d.setDate(d.getDate() + daysUntil);
+            d.setHours(0,0,0,0);
+            for (let i = 0; i < 4; i++) {
+                const copy = new Date(d);
+                tuesdays.push({
+                    dateStr: copy.toISOString().split('T')[0],
+                    day: copy.getDate(),
+                    month: MONTHS[copy.getMonth()],
+                    year: copy.getFullYear(),
+                    label: `TUESDAY ${copy.getDate()} ${MONTHS[copy.getMonth()]}`
+                });
+                d.setDate(d.getDate() + 7);
+            }
+            return tuesdays;
+        }
+
+        function totalBooked(session) {
+            return (session.bookings || []).reduce((s, b) => s + (parseInt(b.guests) || 0), 0);
+        }
+
+        function slotBooked(session, time) {
+            return (session.bookings || []).filter(b => b.time === time).reduce((s, b) => s + (parseInt(b.guests) || 0), 0);
+        }
+
+        lucide.createIcons();
+
+        function init() {
+            state.sessions = getUpcomingTuesdays().map(t => ({ ...t, bookings: [], loaded: false }));
+            renderHomepage();
+            state.sessions.forEach((_, i) => fetchSession(i));
+        }
+
+        function renderHomepage() {
+            const grid = document.getElementById('tuesdayGrid');
+            grid.innerHTML = state.sessions.map((s, i) => `
+                <div class="tuesday-card" onclick="openSession(${i})">
+                    <div class="card-top">
+                        <div class="card-date">
+                            <div class="card-day-num">${s.day}</div>
+                            <div class="card-date-detail">
+                                <div class="card-month">${s.month}</div>
+                                <div class="card-year">${s.year}</div>
+                            </div>
+                        </div>
+                        <i data-lucide="arrow-right" size="18" class="card-arrow"></i>
+                    </div>
+                    <div class="card-divider"></div>
+                    <div class="card-bottom" id="cardBottom-${i}">${renderCardBottom(s)}</div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderCardBottom(s) {
+            if (!s.loaded) return `<div class="card-loading-text">Loading...</div>`;
+            const total = totalBooked(s);
+            const miniSlots = CONFIG.SLOTS.map(time => {
+                const count = slotBooked(s, time);
+                return `<div class="mini-slot ${count > 0 ? 'active' : ''}">
+                    <div class="mini-dot"></div>${time} PM &mdash; ${count}
+                </div>`;
+            }).join('');
+            return `
+                <div class="card-total">
+                    <div class="card-total-num">${total}</div>
+                    <div class="card-total-label">people booked</div>
+                </div>
+                <div class="card-slots-mini">${miniSlots}</div>
+            `;
+        }
+
+        function updateCardBottom(index) {
+            const el = document.getElementById(`cardBottom-${index}`);
+            if (el) { el.innerHTML = renderCardBottom(state.sessions[index]); lucide.createIcons(); }
+        }
+
+        async function fetchSession(index) {
+            const session = state.sessions[index];
+            try {
+                const url = new URL(CONFIG.API_URL);
+                url.searchParams.set('date', session.dateStr);
+                const res = await fetch(url);
+                const data = await res.json();
+                session.bookings = data.bookings || [];
+                session.loaded = true;
+                if (state.currentDate === session.dateStr) renderSessionDetail(index);
+            } catch (err) {
+                session.loaded = true;
+            }
+            updateCardBottom(index);
+        }
+
+        function showHome() {
+            document.getElementById('homeView').style.display = '';
+            document.getElementById('sessionView').style.display = 'none';
+            state.currentDate = null;
+        }
+
+        function openSession(index) {
+            const session = state.sessions[index];
+            state.currentDate = session.dateStr;
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('sessionView').style.display = '';
+            renderSessionDetail(index);
+            fetchSession(index);
+        }
+
+        function currentSessionIndex() {
+            return state.sessions.findIndex(s => s.dateStr === state.currentDate);
+        }
+
+        function refreshSession() {
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.add('spin');
+            const index = currentSessionIndex();
+            if (index >= 0) fetchSession(index).then(() => { if (icon) icon.classList.remove('spin'); });
+        }
+
+        function renderSessionDetail(index) {
+            const session = state.sessions[index];
+            const total = totalBooked(session);
+            document.getElementById('sessionTitle').textContent = session.label;
+            document.getElementById('sessionSubtitle').textContent = session.loaded
+                ? `${total} PEOPLE BOOKED ACROSS ${session.bookings.length} RESERVATION${session.bookings.length !== 1 ? 'S' : ''}`
+                : 'LOADING...';
+            document.getElementById('printDateLine').textContent = `Printed ${new Date().toLocaleString('en-NZ')} — ${session.label}`;
+
+            const container = document.getElementById('slotSections');
+            if (!session.loaded) { container.innerHTML = `<div class="empty-slot">Loading bookings...</div>`; return; }
+
+            container.innerHTML = CONFIG.SLOTS.map(time => {
+                const slotBookings = (session.bookings || []).filter(b => b.time === time).sort((a,b) => a.name.localeCompare(b.name));
+                const count = slotBookings.reduce((s, b) => s + (parseInt(b.guests) || 0), 0);
+                const rows = slotBookings.length > 0
+                    ? slotBookings.map(b => {
+                        const hasNote = b.requests && b.requests.trim().length > 0;
+                        return `<div class="booking-row">
+                            <div class="booking-name">${esc(b.name)}</div>
+                            <div class="booking-phone">${esc(b.phone)}</div>
+                            <div class="booking-guests-wrap">
+                                <div class="booking-guests">${b.guests}</div>
+                                <div class="booking-guests-label">guests</div>
+                            </div>
+                            <div class="booking-requests ${hasNote ? 'has-note' : ''}">${hasNote ? esc(b.requests) : 'No requests'}</div>
+                            <div class="row-actions">
+                                <button class="icon-btn" onclick="openEditModal('${escAttr(b.timestamp)}')" title="Edit"><i data-lucide="pencil" size="13"></i></button>
+                                <button class="icon-btn del" onclick="deleteBooking('${escAttr(b.timestamp)}')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>
+                            </div>
+                        </div>`;
+                    }).join('')
+                    : `<div class="empty-slot">No bookings for this slot yet</div>`;
+
+                return `<div class="slot-group">
+                    <div class="slot-group-header">
+                        <div class="slot-group-title">${time} PM</div>
+                        <div class="slot-group-count">${count} PEOPLE &bull; ${slotBookings.length} BOOKING${slotBookings.length !== 1 ? 'S' : ''}</div>
+                    </div>${rows}
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openEditModal(timestamp) {
+            const index = currentSessionIndex();
+            if (index < 0) return;
+            const booking = state.sessions[index].bookings.find(b => b.timestamp === timestamp);
+            if (!booking) return;
+            document.getElementById('editTimestamp').value = booking.timestamp;
+            document.getElementById('editName').value = booking.name;
+            document.getElementById('editPhone').value = booking.phone;
+            document.getElementById('editGuests').value = booking.guests;
+            document.getElementById('editTime').value = booking.time;
+            document.getElementById('editRequests').value = booking.requests || '';
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
+
+        async function saveEdit() {
+            const payload = {
+                action: 'EDIT',
+                timestamp: document.getElementById('editTimestamp').value,
+                name: document.getElementById('editName').value,
+                phone: document.getElementById('editPhone').value,
+                guests: parseInt(document.getElementById('editGuests').value),
+                time: document.getElementById('editTime').value,
+                requests: document.getElementById('editRequests').value
+            };
+            const index = currentSessionIndex();
+            if (index >= 0) {
+                const booking = state.sessions[index].bookings.find(b => b.timestamp === payload.timestamp);
+                if (booking) Object.assign(booking, payload);
+                renderSessionDetail(index);
+                updateCardBottom(index);
+            }
+            closeEditModal();
+            try {
+                await fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                setTimeout(() => fetchSession(index), 1200);
+            } catch (err) { alert('Save may have failed — please refresh to confirm.'); }
+        }
+
+        async function deleteBooking(timestamp) {
+            if (!confirm('REMOVE THIS BOOKING?')) return;
+            const index = currentSessionIndex();
+            if (index >= 0) {
+                state.sessions[index].bookings = state.sessions[index].bookings.filter(b => b.timestamp !== timestamp);
+                renderSessionDetail(index);
+                updateCardBottom(index);
+            }
+            try {
+                await fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', timestamp }) });
+                setTimeout(() => fetchSession(index), 1200);
+            } catch (err) { alert('Delete may have failed — please refresh to confirm.'); }
+        }
+
+        function esc(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function escAttr(str) { return String(str || '').replace(/'/g, "\\'"); }
+
+        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+
+        init();
+    </script>
 </body>
 </html>
