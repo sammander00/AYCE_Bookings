@@ -9,599 +9,303 @@
     <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Bebas+Neue&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* ── RESET & ROOT ── */
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pirata+One&family=Roboto:wght@300;400;700;900&display=swap');
-
         :root {
-            --hell-red: #C80613;
-            --hell-bone: #E1D8B7;
-            --hell-black: #151515;
-            --font-heading: 'Bebas Neue', cursive;
-            --font-display: 'Pirata One', cursive;
-            --font-body: 'Roboto', sans-serif;
-            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+            --red:   #C80613;
+            --bone:  #E1D8B7;
+            --black: #151515;
+            --fh: 'Bebas Neue', cursive;
+            --fd: 'Pirata One', cursive;
+            --fb: 'Roboto', sans-serif;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
-        body {
-            background-color: #151515;
-            color: #E1D8B7;
-            font-family: 'Roboto', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            letter-spacing: 0.02em;
-        }
+        body { background: var(--black); color: var(--bone); font-family: var(--fb); min-height: 100vh; overflow-x: hidden; letter-spacing: 0.02em; }
 
-        .texture-overlay {
-            position: fixed;
-            inset: 0;
+        .texture {
+            position: fixed; inset: 0;
             background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png');
-            background-repeat: repeat;
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: 0;
+            opacity: 0.1; pointer-events: none; z-index: 0;
         }
 
-        /* ── MAIN CONTAINER ── */
-        .admin-wrap {
-            max-width: 1100px;
-            margin: 4rem auto;
-            padding: 3rem;
-            background: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(225, 216, 183, 0.1);
-            border-radius: 4px;
-            position: relative;
-            z-index: 10;
-            overflow: hidden;
+        .wrap {
+            max-width: 1100px; margin: 4rem auto; padding: 3rem;
+            background: rgba(20,20,20,0.95); border: 1px solid rgba(225,216,183,0.1);
+            border-radius: 4px; position: relative; z-index: 10; overflow: hidden;
         }
-
-        .admin-wrap::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 70%; height: 50%;
-            background: #C80613;
-            filter: blur(120px);
-            opacity: 0.09;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 0;
+        .wrap::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 70%; height: 50%; background: var(--red);
+            filter: blur(120px); opacity: 0.09;
+            transform: translate(-50%,-50%); pointer-events: none;
         }
-
-        .admin-wrap > * { position: relative; z-index: 1; }
+        .wrap > * { position: relative; z-index: 1; }
 
         /* ── TOPBAR ── */
-        .admin-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 2rem;
-            margin-bottom: 2.5rem;
-            border-bottom: 1px solid rgba(225, 216, 183, 0.1);
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-bottom: 2rem; margin-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(225,216,183,0.1);
         }
-
-        .topbar-brand {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1.6rem;
-            letter-spacing: 0.2em;
-            color: #E1D8B7;
-        }
-        .topbar-brand span { color: #C80613; }
-
+        .topbar-brand { font-family: var(--fh); font-size: 1.6rem; letter-spacing: 0.2em; }
+        .topbar-brand span { color: var(--red); }
         .topbar-link {
-            background: none;
-            border: 1px solid rgba(225,216,183,0.15);
-            color: #E1D8B7;
-            padding: 0.5rem 1.2rem;
-            font-family: 'Bebas Neue', cursive;
-            font-size: 0.95rem;
-            letter-spacing: 0.12em;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: none; border: 1px solid rgba(225,216,183,0.15); color: var(--bone);
+            padding: 0.5rem 1.2rem; font-family: var(--fh); font-size: 0.95rem;
+            letter-spacing: 0.12em; cursor: pointer; text-decoration: none;
+            transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;
         }
-        .topbar-link:hover { border-color: #C80613; color: #C80613; }
+        .topbar-link:hover { border-color: var(--red); color: var(--red); }
 
-        /* ── HOME VIEW ── */
+        /* ── HOME ── */
         .home-heading { margin-bottom: 2.5rem; }
+        .home-heading h1 { font-family: var(--fh); font-size: 3.5rem; letter-spacing: 0.08em; line-height: 1; }
+        .home-heading p { font-size: 0.8rem; font-weight: 900; letter-spacing: 0.3em; text-transform: uppercase; color: var(--red); margin-top: 0.5rem; }
 
-        .home-heading h1 {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 3.5rem;
-            letter-spacing: 0.08em;
-            line-height: 1;
-            color: #E1D8B7;
-        }
-
-        .home-heading p {
-            font-size: 0.8rem;
-            font-weight: 900;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: #C80613;
-            margin-top: 0.5rem;
-        }
-
-        .tuesday-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.2rem;
-        }
+        .tuesday-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
 
         .tuesday-card {
-            border: 1px solid rgba(225,216,183,0.12);
-            background: rgba(225,216,183,0.02);
-            padding: 2rem;
-            cursor: pointer;
-            transition: all 0.25s;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(225,216,183,0.12); background: rgba(225,216,183,0.02);
+            padding: 2rem; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
         }
-
         .tuesday-card::after {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 3px;
-            background: #C80613;
-            transform: scaleY(0);
-            transform-origin: bottom;
-            transition: transform 0.25s;
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background: var(--red); transform: scaleY(0); transform-origin: bottom; transition: transform 0.25s;
         }
-
-        .tuesday-card:hover {
-            border-color: rgba(225,216,183,0.25);
-            background: rgba(225,216,183,0.045);
-            box-shadow: 0 0 30px rgba(200,6,19,0.1);
-        }
+        .tuesday-card:hover { border-color: rgba(225,216,183,0.25); background: rgba(225,216,183,0.045); box-shadow: 0 0 30px rgba(200,6,19,0.1); }
         .tuesday-card:hover::after { transform: scaleY(1); }
 
-        .card-top {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 1.8rem;
-        }
-
+        .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.8rem; }
         .card-date { display: flex; align-items: baseline; gap: 0.7rem; }
-
-        .card-day-num {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 4.5rem;
-            line-height: 1;
-            color: #E1D8B7;
-        }
-
+        .card-day-num { font-family: var(--fh); font-size: 4.5rem; line-height: 1; }
         .card-date-detail { display: flex; flex-direction: column; }
-
-        .card-month {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1.5rem;
-            letter-spacing: 0.08em;
-            color: #E1D8B7;
-            opacity: 0.55;
-            line-height: 1.1;
-        }
-
-        .card-year {
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            color: #E1D8B7;
-            opacity: 0.25;
-        }
-
-        .card-arrow {
-            color: #C80613;
-            opacity: 0;
-            transition: opacity 0.2s, transform 0.2s;
-            margin-top: 0.3rem;
-        }
+        .card-month { font-family: var(--fh); font-size: 1.5rem; letter-spacing: 0.08em; opacity: 0.55; line-height: 1.1; }
+        .card-year { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; opacity: 0.25; }
+        .card-arrow { color: var(--red); opacity: 0; transition: opacity 0.2s, transform 0.2s; margin-top: 0.3rem; }
         .tuesday-card:hover .card-arrow { opacity: 1; transform: translateX(4px); }
-
-        .card-divider {
-            height: 1px;
-            background: rgba(225,216,183,0.08);
-            margin-bottom: 1.5rem;
-        }
-
-        .card-bottom {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-        }
-
+        .card-divider { height: 1px; background: rgba(225,216,183,0.08); margin-bottom: 1.5rem; }
+        .card-bottom { display: flex; align-items: flex-end; justify-content: space-between; }
         .card-total { display: flex; align-items: baseline; gap: 0.4rem; }
-
-        .card-total-num {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 3rem;
-            line-height: 1;
-            color: #C80613;
-        }
-
-        .card-total-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #E1D8B7;
-            opacity: 0.35;
-        }
-
-        .card-slots-mini {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            align-items: flex-end;
-        }
-
-        .mini-slot {
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            color: #E1D8B7;
-            opacity: 0.28;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .card-total-num { font-family: var(--fh); font-size: 3rem; line-height: 1; color: var(--red); }
+        .card-total-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.35; }
+        .card-slots-mini { display: flex; flex-direction: column; gap: 0.3rem; align-items: flex-end; }
+        .mini-slot { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; opacity: 0.28; display: flex; align-items: center; gap: 0.5rem; }
         .mini-slot.active { opacity: 0.8; }
-
-        .mini-dot {
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: #C80613;
-            opacity: 0.4;
-        }
+        .mini-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); opacity: 0.4; }
         .mini-slot.active .mini-dot { opacity: 1; }
-
-        .card-loading-text {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #E1D8B7;
-            opacity: 0.3;
-        }
+        .card-loading-text { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.3; }
 
         /* ── SESSION VIEW ── */
         #sessionView { display: none; }
 
         .session-back {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: none;
-            border: none;
-            color: #E1D8B7;
-            font-family: 'Bebas Neue', cursive;
-            font-size: 0.9rem;
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            opacity: 0.4;
-            transition: opacity 0.2s;
-            padding: 0;
-            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            background: none; border: none; color: var(--bone);
+            font-family: var(--fh); font-size: 0.9rem; letter-spacing: 0.15em;
+            cursor: pointer; opacity: 0.4; transition: opacity 0.2s; padding: 0; margin-bottom: 1.5rem;
         }
         .session-back:hover { opacity: 1; }
 
         .session-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(225,216,183,0.08);
+            display: flex; align-items: flex-end; justify-content: space-between;
+            margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;
+            padding-bottom: 2rem; border-bottom: 1px solid rgba(225,216,183,0.08);
         }
-
-        .session-title h2 {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 3.5rem;
-            letter-spacing: 0.06em;
-            line-height: 1;
-            color: #E1D8B7;
-        }
-
-        .session-title p {
-            font-size: 0.8rem;
-            font-weight: 900;
-            letter-spacing: 0.25em;
-            color: #C80613;
-            margin-top: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        .session-action-row { display: flex; gap: 0.8rem; }
+        .session-title h2 { font-family: var(--fh); font-size: 3.5rem; letter-spacing: 0.06em; line-height: 1; }
+        .session-title p { font-size: 0.8rem; font-weight: 900; letter-spacing: 0.25em; color: var(--red); margin-top: 0.5rem; text-transform: uppercase; }
+        .session-actions { display: flex; gap: 0.8rem; }
 
         .btn-outline {
-            background: none;
-            border: 1px solid rgba(225,216,183,0.18);
-            color: #E1D8B7;
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1rem;
-            letter-spacing: 0.1em;
-            padding: 0.65rem 1.3rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: none; border: 1px solid rgba(225,216,183,0.18); color: var(--bone);
+            font-family: var(--fh); font-size: 1rem; letter-spacing: 0.1em;
+            padding: 0.65rem 1.3rem; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 0.5rem;
         }
-        .btn-outline:hover { border-color: #C80613; color: #C80613; }
+        .btn-outline:hover { border-color: var(--red); color: var(--red); }
 
         .btn-solid {
-            background: #C80613;
-            border: 1px solid #C80613;
-            color: #151515;
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1rem;
-            letter-spacing: 0.1em;
-            padding: 0.65rem 1.3rem;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: var(--red); border: 1px solid var(--red); color: var(--black);
+            font-family: var(--fh); font-size: 1rem; letter-spacing: 0.1em;
+            padding: 0.65rem 1.3rem; cursor: pointer; transition: opacity 0.2s;
+            display: flex; align-items: center; gap: 0.5rem;
         }
         .btn-solid:hover { opacity: 0.82; }
 
-        /* Slot groups */
-        .slot-group { margin-bottom: 2.5rem; }
+        /* ── BOOKING TABLE ── */
+        .slot-group { margin-bottom: 3rem; }
 
         .slot-group-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 0.8rem;
-            border-bottom: 1px solid rgba(225,216,183,0.08);
-            margin-bottom: 0.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            padding-bottom: 0.8rem; margin-bottom: 0;
+            border-bottom: 2px solid rgba(225,216,183,0.12);
+        }
+        .slot-group-title { font-family: var(--fd); font-size: 2rem; color: var(--bone); }
+        .slot-group-meta { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red); }
+
+        /* Column header row */
+        .booking-col-headers {
+            display: grid;
+            grid-template-columns: 2fr 1fr 3fr auto;
+            gap: 1rem;
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid rgba(225,216,183,0.06);
+            background: rgba(225,216,183,0.025);
+        }
+        .col-header {
+            font-size: 0.65rem; font-weight: 900; letter-spacing: 0.2em;
+            text-transform: uppercase; opacity: 0.4;
         }
 
-        .slot-group-title {
-            font-family: 'Pirata One', cursive;
-            font-size: 2rem;
-            color: #E1D8B7;
-        }
-
-        .slot-group-count {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #C80613;
-        }
-
+        /* Each booking row */
         .booking-row {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 60px 1.2fr auto;
+            grid-template-columns: 2fr 1fr 3fr auto;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 0.8rem;
+            padding: 1.1rem 1rem;
             border-bottom: 1px solid rgba(225,216,183,0.05);
             transition: background 0.12s;
         }
         .booking-row:hover { background: rgba(225,216,183,0.025); }
 
-        .booking-name {
-            font-size: 0.88rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            text-transform: uppercase;
-            color: #E1D8B7;
+        .b-name {
+            font-size: 0.95rem; font-weight: 700;
+            letter-spacing: 0.05em; text-transform: uppercase;
         }
-
-        .booking-phone {
-            font-size: 0.82rem;
-            color: #E1D8B7;
-            opacity: 0.38;
+        .b-guests {
+            font-family: var(--fh); font-size: 1.6rem; color: var(--red); line-height: 1;
         }
-
-        .booking-guests-wrap { text-align: center; }
-
-        .booking-guests {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 1.8rem;
-            color: #C80613;
-            line-height: 1;
-        }
-
-        .booking-guests-label {
-            font-size: 0.55rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: #E1D8B7;
-            opacity: 0.35;
-            text-transform: uppercase;
-            margin-top: -2px;
-        }
-
-        .booking-requests {
-            font-size: 0.78rem;
-            font-style: italic;
-            color: #E1D8B7;
-            opacity: 0.3;
-        }
-        .booking-requests.has-note { opacity: 0.75; }
-
-        .row-actions { display: flex; gap: 0.35rem; justify-content: flex-end; }
+        .b-guests-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; }
+        .b-requests { font-size: 0.82rem; font-style: italic; opacity: 0.4; line-height: 1.4; }
+        .b-requests.has-note { opacity: 0.8; color: var(--bone); font-style: normal; }
+        .b-actions { display: flex; gap: 0.35rem; justify-content: flex-end; }
 
         .icon-btn {
-            width: 30px; height: 30px;
-            background: none;
-            border: 1px solid rgba(225,216,183,0.1);
-            color: #E1D8B7;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-            opacity: 0.5;
+            width: 30px; height: 30px; background: none;
+            border: 1px solid rgba(225,216,183,0.1); color: var(--bone);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; opacity: 0.5;
         }
-        .icon-btn:hover { opacity: 1; border-color: #C80613; color: #C80613; }
+        .icon-btn:hover { opacity: 1; border-color: var(--red); color: var(--red); }
         .icon-btn.del:hover { border-color: #e05050; color: #e05050; }
 
         .empty-slot {
-            padding: 1.8rem 0.8rem;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #E1D8B7;
-            opacity: 0.2;
+            padding: 2rem 1rem; font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.2;
         }
 
         /* ── EDIT MODAL ── */
         .modal-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85); z-index: 200;
+            align-items: center; justify-content: center; padding: 2rem;
         }
         .modal-backdrop.open { display: flex; }
-
         .modal-box {
-            background: rgba(20, 20, 20, 0.98);
-            border: 1px solid rgba(225,216,183,0.12);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 460px;
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
+            background: rgba(20,20,20,0.98); border: 1px solid rgba(225,216,183,0.12);
+            padding: 2.5rem; width: 100%; max-width: 460px;
+            backdrop-filter: blur(20px); position: relative; overflow: hidden;
         }
-
         .modal-box::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 60%; height: 40%;
-            background: #C80613;
-            filter: blur(80px);
-            opacity: 0.08;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 60%; height: 40%; background: var(--red);
+            filter: blur(80px); opacity: 0.08; transform: translate(-50%,-50%); pointer-events: none;
         }
         .modal-box > * { position: relative; z-index: 1; }
-
-        .modal-title {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 2.2rem;
-            letter-spacing: 0.06em;
-            margin-bottom: 2rem;
-            color: #E1D8B7;
-        }
-
+        .modal-title { font-family: var(--fh); font-size: 2.2rem; letter-spacing: 0.06em; margin-bottom: 2rem; }
         .modal-field { margin-bottom: 1.2rem; }
-
-        .modal-field label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 900;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #E1D8B7;
-            opacity: 0.5;
-            margin-bottom: 0.45rem;
-        }
-
+        .modal-field label { display: block; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.45rem; }
         .modal-field input,
         .modal-field select,
         .modal-field textarea {
-            width: 100%;
-            background: rgba(225,216,183,0.03);
-            border: 1px solid rgba(225, 216, 183, 0.15);
-            border-radius: 2px;
-            color: #E1D8B7;
-            padding: 1rem 1.2rem;
-            font-size: 0.95rem;
-            font-family: 'Roboto', sans-serif;
-            transition: all 0.3s;
+            width: 100%; background: rgba(225,216,183,0.03);
+            border: 1px solid rgba(225,216,183,0.15); border-radius: 2px;
+            color: var(--bone); padding: 1rem 1.2rem; font-size: 0.95rem; font-family: var(--fb); transition: all 0.3s;
         }
         .modal-field select { background: #1a1a1a; }
         .modal-field textarea { resize: vertical; min-height: 80px; }
-
-        .modal-field input:focus,
-        .modal-field select:focus,
-        .modal-field textarea:focus {
-            outline: none;
-            border-color: #C80613;
-            background: rgba(225, 216, 183, 0.07);
-            box-shadow: 0 0 10px rgba(200,6,19,0.2);
+        .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
+            outline: none; border-color: var(--red); background: rgba(225,216,183,0.07); box-shadow: 0 0 10px rgba(200,6,19,0.2);
         }
-
-        .modal-btns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.8rem;
-            margin-top: 1.8rem;
-        }
+        .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1.8rem; }
 
         /* ── PRINT ── */
         @media print {
             body { background: white !important; color: black !important; }
-            .texture-overlay, .admin-topbar, .session-back,
-            .session-action-row, .row-actions { display: none !important; }
-            .admin-wrap { border: none !important; background: white !important; box-shadow: none !important; margin: 0 !important; padding: 1rem !important; }
-            .admin-wrap::before { display: none !important; }
+            .texture, .topbar, .session-back, .session-actions,
+            .b-actions, .booking-col-headers, .modal-backdrop { display: none !important; }
+            .wrap { border: none !important; background: white !important; margin: 0 !important; padding: 0.5rem 1rem !important; }
+            .wrap::before { display: none !important; }
             #homeView { display: none !important; }
             #sessionView { display: block !important; }
-            .session-header { border-bottom: 2px solid #222; }
-            .session-title h2 { color: black; }
+
+            .session-header { border-bottom: 2px solid #222 !important; margin-bottom: 1.5rem !important; padding-bottom: 1rem !important; }
+            .session-title h2 { color: black; font-size: 2rem; }
             .session-title p { color: #C80613; }
-            .slot-group { page-break-inside: avoid; }
-            .slot-group-header { border-bottom: 2px solid #222; }
+
+            .slot-group { page-break-inside: avoid; margin-bottom: 2rem; }
+            .slot-group-header { border-bottom: 2px solid #222 !important; }
             .slot-group-title { color: black; }
-            .slot-group-count { color: #C80613; }
-            .booking-row { border-bottom: 1px solid #ddd; grid-template-columns: 1.2fr 1fr 60px 1.5fr; }
-            .booking-name { color: black; }
-            .booking-phone { color: #666; opacity: 1; }
-            .booking-guests { color: #C80613; }
-            .booking-guests-label { color: #999; opacity: 1; }
-            .booking-requests { color: #444; opacity: 1; }
-            .booking-requests.has-note { color: #111; opacity: 1; }
-            .print-date-line { display: block !important; color: #999; font-size: 0.75rem; margin-bottom: 1.5rem; }
+            .slot-group-meta { color: #C80613; }
+
+            /* Print table with clean columns */
+            .booking-row {
+                grid-template-columns: 2fr 1fr 3fr !important;
+                border-bottom: 1px solid #ddd !important;
+                padding: 0.7rem 0 !important;
+            }
+            .b-name { color: black; font-size: 0.9rem; }
+            .b-guests { color: #C80613; font-size: 1.2rem; }
+            .b-guests-label { color: #999; opacity: 1; }
+            .b-requests { color: #444; opacity: 1; font-style: italic; }
+            .b-requests.has-note { color: #111; opacity: 1; font-style: normal; }
+
+            /* Print header row */
+            .print-col-headers { display: grid !important; }
+
+            .print-date-line { display: block !important; }
         }
 
-        .print-date-line { display: none; }
+        .print-col-headers {
+            display: none;
+            grid-template-columns: 2fr 1fr 3fr;
+            gap: 1rem; padding: 0.5rem 0; margin-bottom: 0.3rem;
+            border-bottom: 1px solid #ccc;
+        }
+        .print-col-header { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #666; }
 
+        .print-date-line {
+            display: none; font-size: 0.75rem; color: #999;
+            margin-bottom: 1.5rem; font-style: italic;
+        }
+
+        /* Responsive */
         @media (max-width: 800px) {
             .tuesday-grid { grid-template-columns: 1fr; }
-            .admin-wrap { margin: 1rem; padding: 1.5rem; }
+            .wrap { margin: 1rem; padding: 1.5rem; }
             .session-header { flex-direction: column; align-items: flex-start; }
-            .booking-row { grid-template-columns: 1fr auto; row-gap: 0.3rem; }
-            .booking-requests, .row-actions { grid-column: 1 / -1; }
+            .booking-row { grid-template-columns: 1fr auto !important; row-gap: 0.3rem; }
+            .b-requests { grid-column: 1 / -1; }
+            .b-actions { grid-column: 1 / -1; }
+            .booking-col-headers { display: none; }
         }
 
-        .spin { animation: adminSpin 0.7s linear infinite; }
-        @keyframes adminSpin { to { transform: rotate(360deg); } }
+        .spin { animation: sp 0.7s linear infinite; }
+        @keyframes sp { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="texture-overlay"></div>
+    <div class="texture"></div>
 
-    <main class="admin-wrap">
-
-        <header class="admin-topbar">
+    <main class="wrap">
+        <header class="topbar">
             <div class="topbar-brand">HELL <span>PIZZA</span> &mdash; STAFF</div>
             <a href="index.html" class="topbar-link">
-                <i data-lucide="external-link" size="13"></i>
-                BOOKING FORM
+                <i data-lucide="external-link" size="13"></i>BOOKING FORM
             </a>
         </header>
 
-        <!-- HOME VIEW -->
+        <!-- HOME -->
         <div id="homeView">
             <div class="home-heading">
                 <h1>UPCOMING SESSIONS</h1>
@@ -610,11 +314,10 @@
             <div class="tuesday-grid" id="tuesdayGrid"></div>
         </div>
 
-        <!-- SESSION DETAIL VIEW -->
+        <!-- SESSION DETAIL -->
         <div id="sessionView">
             <button class="session-back" onclick="showHome()">
-                <i data-lucide="arrow-left" size="15"></i>
-                ALL SESSIONS
+                <i data-lucide="arrow-left" size="15"></i>ALL SESSIONS
             </button>
 
             <div class="session-header">
@@ -622,14 +325,12 @@
                     <h2 id="sessionTitle">TUESDAY</h2>
                     <p id="sessionSubtitle">LOADING...</p>
                 </div>
-                <div class="session-action-row">
+                <div class="session-actions">
                     <button class="btn-outline" onclick="refreshSession()">
-                        <i data-lucide="refresh-cw" size="14" id="refreshIcon"></i>
-                        REFRESH
+                        <i data-lucide="refresh-cw" size="14" id="refreshIcon"></i>REFRESH
                     </button>
                     <button class="btn-outline" onclick="window.print()">
-                        <i data-lucide="printer" size="14"></i>
-                        PRINT LIST
+                        <i data-lucide="printer" size="14"></i>PRINT
                     </button>
                 </div>
             </div>
@@ -637,7 +338,6 @@
             <p class="print-date-line" id="printDateLine"></p>
             <div id="slotSections"></div>
         </div>
-
     </main>
 
     <!-- EDIT MODAL -->
@@ -645,18 +345,9 @@
         <div class="modal-box">
             <h2 class="modal-title">EDIT BOOKING</h2>
             <input type="hidden" id="editTimestamp">
-            <div class="modal-field">
-                <label>Name</label>
-                <input type="text" id="editName">
-            </div>
-            <div class="modal-field">
-                <label>Phone</label>
-                <input type="tel" id="editPhone">
-            </div>
-            <div class="modal-field">
-                <label>Guests</label>
-                <input type="number" id="editGuests" min="1" max="15">
-            </div>
+            <div class="modal-field"><label>Name</label><input type="text" id="editName"></div>
+            <div class="modal-field"><label>Phone</label><input type="tel" id="editPhone"></div>
+            <div class="modal-field"><label>Guests</label><input type="number" id="editGuests" min="1" max="15"></div>
             <div class="modal-field">
                 <label>Arrival Time</label>
                 <select id="editTime">
@@ -665,10 +356,7 @@
                     <option value="6:30">6:30 PM</option>
                 </select>
             </div>
-            <div class="modal-field">
-                <label>Special Requests</label>
-                <textarea id="editRequests" placeholder="Dietary needs, accessibility, etc."></textarea>
-            </div>
+            <div class="modal-field"><label>Special Requests</label><textarea id="editRequests" placeholder="Dietary needs, accessibility, etc."></textarea></div>
             <div class="modal-btns">
                 <button class="btn-solid" onclick="saveEdit()">SAVE CHANGES</button>
                 <button class="btn-outline" onclick="closeEditModal()">CANCEL</button>
@@ -677,107 +365,82 @@
     </div>
 
     <script>
-        const CONFIG = {
-            API_URL: "https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec",
+        var CONFIG = {
+            API_URL: 'https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec',
             SLOTS: ['5:30', '6:00', '6:30']
         };
 
-        let state = { sessions: [], currentDate: null };
-        const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+        var state = { sessions: [], currentDate: null };
+        var MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+        function localDateStr(d) {
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
 
         function getUpcomingTuesdays() {
-            const tuesdays = [];
-            let d = new Date();
-            const dayOfWeek = d.getDay();
-            let daysUntil = (2 - dayOfWeek + 7) % 7;
-            if (daysUntil === 0 && d.getHours() >= 20) daysUntil = 7;
-            d.setDate(d.getDate() + daysUntil);
-            d.setHours(12,0,0,0);
-            for (let i = 0; i < 4; i++) {
-                const copy = new Date(d);
-                tuesdays.push({
-                    dateStr: (function(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })(copy),
-                    day: copy.getDate(),
-                    month: MONTHS[copy.getMonth()],
-                    year: copy.getFullYear(),
-                    label: `TUESDAY ${copy.getDate()} ${MONTHS[copy.getMonth()]}`
-                });
-                d.setDate(d.getDate() + 7);
+            var now = new Date();
+            var offset = (2 - now.getDay() + 7) % 7;
+            if (offset === 0 && now.getHours() >= 20) offset = 7;
+            var out = [];
+            for (var i = 0; i < 4; i++) {
+                var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset + i*7, 12, 0, 0);
+                out.push({ dateStr: localDateStr(d), day: d.getDate(), month: MONTHS[d.getMonth()], year: d.getFullYear(), label: 'TUESDAY ' + d.getDate() + ' ' + MONTHS[d.getMonth()] });
             }
-            return tuesdays;
+            return out;
         }
 
-        function totalBooked(session) {
-            return (session.bookings || []).reduce((s, b) => s + (parseInt(b.guests) || 0), 0);
-        }
-
-        function slotBooked(session, time) {
-            return (session.bookings || []).filter(b => b.time === time).reduce((s, b) => s + (parseInt(b.guests) || 0), 0);
-        }
+        function totalBooked(s) { return (s.bookings||[]).reduce(function(a,b){ return a+(parseInt(b.guests)||0); },0); }
+        function slotBooked(s,t) { return (s.bookings||[]).filter(function(b){ return b.time===t; }).reduce(function(a,b){ return a+(parseInt(b.guests)||0); },0); }
 
         lucide.createIcons();
 
         function init() {
-            state.sessions = getUpcomingTuesdays().map(t => ({ ...t, bookings: [], loaded: false }));
-            renderHomepage();
-            state.sessions.forEach((_, i) => fetchSession(i));
+            state.sessions = getUpcomingTuesdays().map(function(t){ return Object.assign({},t,{bookings:[],loaded:false}); });
+            renderHome();
+            state.sessions.forEach(function(_,i){ fetchSession(i); });
         }
 
-        function renderHomepage() {
-            const grid = document.getElementById('tuesdayGrid');
-            grid.innerHTML = state.sessions.map((s, i) => `
-                <div class="tuesday-card" onclick="openSession(${i})">
-                    <div class="card-top">
-                        <div class="card-date">
-                            <div class="card-day-num">${s.day}</div>
-                            <div class="card-date-detail">
-                                <div class="card-month">${s.month}</div>
-                                <div class="card-year">${s.year}</div>
-                            </div>
-                        </div>
-                        <i data-lucide="arrow-right" size="18" class="card-arrow"></i>
-                    </div>
-                    <div class="card-divider"></div>
-                    <div class="card-bottom" id="cardBottom-${i}">${renderCardBottom(s)}</div>
-                </div>
-            `).join('');
+        function renderHome() {
+            var grid = document.getElementById('tuesdayGrid');
+            grid.innerHTML = state.sessions.map(function(s,i){
+                return '<div class="tuesday-card" onclick="openSession('+i+')">'
+                    +'<div class="card-top"><div class="card-date">'
+                    +'<div class="card-day-num">'+s.day+'</div>'
+                    +'<div class="card-date-detail"><div class="card-month">'+s.month+'</div><div class="card-year">'+s.year+'</div></div>'
+                    +'</div><i data-lucide="arrow-right" size="18" class="card-arrow"></i></div>'
+                    +'<div class="card-divider"></div>'
+                    +'<div class="card-bottom" id="cb-'+i+'">'+renderCardBottom(s)+'</div></div>';
+            }).join('');
             lucide.createIcons();
         }
 
         function renderCardBottom(s) {
-            if (!s.loaded) return `<div class="card-loading-text">Loading...</div>`;
-            const total = totalBooked(s);
-            const miniSlots = CONFIG.SLOTS.map(time => {
-                const count = slotBooked(s, time);
-                return `<div class="mini-slot ${count > 0 ? 'active' : ''}">
-                    <div class="mini-dot"></div>${time} PM &mdash; ${count}
-                </div>`;
+            if (!s.loaded) return '<div class="card-loading-text">Loading...</div>';
+            var total = totalBooked(s);
+            var mini = CONFIG.SLOTS.map(function(t){
+                var c = slotBooked(s,t);
+                return '<div class="mini-slot'+(c>0?' active':'')+'"><div class="mini-dot"></div>'+t+' PM &mdash; '+c+'</div>';
             }).join('');
-            return `
-                <div class="card-total">
-                    <div class="card-total-num">${total}</div>
-                    <div class="card-total-label">people booked</div>
-                </div>
-                <div class="card-slots-mini">${miniSlots}</div>
-            `;
+            return '<div class="card-total"><div class="card-total-num">'+total+'</div><div class="card-total-label">people booked</div></div>'
+                  +'<div class="card-slots-mini">'+mini+'</div>';
         }
 
-        function updateCardBottom(index) {
-            const el = document.getElementById(`cardBottom-${index}`);
-            if (el) { el.innerHTML = renderCardBottom(state.sessions[index]); lucide.createIcons(); }
+        function updateCardBottom(i) {
+            var el = document.getElementById('cb-'+i);
+            if (el) { el.innerHTML = renderCardBottom(state.sessions[i]); lucide.createIcons(); }
         }
 
         async function fetchSession(index) {
-            const session = state.sessions[index];
+            var session = state.sessions[index];
             try {
-                const url = new URL(CONFIG.API_URL);
+                var url = new URL(CONFIG.API_URL);
                 url.searchParams.set('date', session.dateStr);
-                const res = await fetch(url);
-                const data = await res.json();
+                var res  = await fetch(url.toString());
+                var data = await res.json();
                 session.bookings = data.bookings || [];
                 session.loaded = true;
                 if (state.currentDate === session.dateStr) renderSessionDetail(index);
-            } catch (err) {
+            } catch(e) {
                 session.loaded = true;
             }
             updateCardBottom(index);
@@ -789,132 +452,136 @@
             state.currentDate = null;
         }
 
-        function openSession(index) {
-            const session = state.sessions[index];
-            state.currentDate = session.dateStr;
+        function openSession(i) {
+            state.currentDate = state.sessions[i].dateStr;
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('sessionView').style.display = '';
-            renderSessionDetail(index);
-            fetchSession(index);
+            renderSessionDetail(i);
+            fetchSession(i);
         }
 
-        function currentSessionIndex() {
-            return state.sessions.findIndex(s => s.dateStr === state.currentDate);
-        }
+        function currentIdx() { return state.sessions.findIndex(function(s){ return s.dateStr===state.currentDate; }); }
 
         function refreshSession() {
-            const icon = document.getElementById('refreshIcon');
+            var icon = document.getElementById('refreshIcon');
+            var i = currentIdx();
             if (icon) icon.classList.add('spin');
-            const index = currentSessionIndex();
-            if (index >= 0) fetchSession(index).then(() => { if (icon) icon.classList.remove('spin'); });
+            if (i >= 0) fetchSession(i).then(function(){ if (icon) icon.classList.remove('spin'); });
         }
 
         function renderSessionDetail(index) {
-            const session = state.sessions[index];
-            const total = totalBooked(session);
-            document.getElementById('sessionTitle').textContent = session.label;
-            document.getElementById('sessionSubtitle').textContent = session.loaded
-                ? `${total} PEOPLE BOOKED ACROSS ${session.bookings.length} RESERVATION${session.bookings.length !== 1 ? 'S' : ''}`
+            var s = state.sessions[index];
+            var total = totalBooked(s);
+
+            document.getElementById('sessionTitle').textContent = s.label;
+            document.getElementById('sessionSubtitle').textContent = s.loaded
+                ? total + ' PEOPLE BOOKED — ' + s.bookings.length + ' RESERVATION' + (s.bookings.length !== 1 ? 'S' : '')
                 : 'LOADING...';
-            document.getElementById('printDateLine').textContent = `Printed ${new Date().toLocaleString('en-NZ')} — ${session.label}`;
+            document.getElementById('printDateLine').textContent =
+                'Printed ' + new Date().toLocaleString('en-NZ') + ' — ' + s.label;
 
-            const container = document.getElementById('slotSections');
-            if (!session.loaded) { container.innerHTML = `<div class="empty-slot">Loading bookings...</div>`; return; }
+            var container = document.getElementById('slotSections');
+            if (!s.loaded) { container.innerHTML = '<div class="empty-slot">Loading bookings...</div>'; return; }
 
-            container.innerHTML = CONFIG.SLOTS.map(time => {
-                const slotBookings = (session.bookings || []).filter(b => b.time === time).sort((a,b) => a.name.localeCompare(b.name));
-                const count = slotBookings.reduce((s, b) => s + (parseInt(b.guests) || 0), 0);
-                const rows = slotBookings.length > 0
-                    ? slotBookings.map(b => {
-                        const hasNote = b.requests && b.requests.trim().length > 0;
-                        return `<div class="booking-row">
-                            <div class="booking-name">${esc(b.name)}</div>
-                            <div class="booking-phone">${esc(b.phone)}</div>
-                            <div class="booking-guests-wrap">
-                                <div class="booking-guests">${b.guests}</div>
-                                <div class="booking-guests-label">guests</div>
-                            </div>
-                            <div class="booking-requests ${hasNote ? 'has-note' : ''}">${hasNote ? esc(b.requests) : 'No requests'}</div>
-                            <div class="row-actions">
-                                <button class="icon-btn" onclick="openEditModal('${escAttr(b.timestamp)}')" title="Edit"><i data-lucide="pencil" size="13"></i></button>
-                                <button class="icon-btn del" onclick="deleteBooking('${escAttr(b.timestamp)}')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>
-                            </div>
-                        </div>`;
+            container.innerHTML = CONFIG.SLOTS.map(function(time) {
+                var rows = (s.bookings || [])
+                    .filter(function(b) { return b.time === time; })
+                    .sort(function(a,b) { return a.name.localeCompare(b.name); });
+
+                var guestCount = rows.reduce(function(acc,b){ return acc+(parseInt(b.guests)||0); }, 0);
+
+                var rowsHtml = rows.length > 0
+                    ? rows.map(function(b) {
+                        var hasNote = b.requests && b.requests.trim().length > 0;
+                        return '<div class="booking-row">'
+                            + '<div class="b-name">'+esc(b.name)+'</div>'
+                            + '<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
+                            + '<div class="b-requests'+(hasNote?' has-note':'')+'">'+( hasNote ? esc(b.requests) : '—' )+'</div>'
+                            + '<div class="b-actions">'
+                            + '<button class="icon-btn" onclick="openEdit(\''+escA(b.timestamp)+'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
+                            + '<button class="icon-btn del" onclick="delBooking(\''+escA(b.timestamp)+'\')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
+                            + '</div></div>';
                     }).join('')
-                    : `<div class="empty-slot">No bookings for this slot yet</div>`;
+                    : '<div class="empty-slot">No bookings yet</div>';
 
-                return `<div class="slot-group">
-                    <div class="slot-group-header">
-                        <div class="slot-group-title">${time} PM</div>
-                        <div class="slot-group-count">${count} PEOPLE &bull; ${slotBookings.length} BOOKING${slotBookings.length !== 1 ? 'S' : ''}</div>
-                    </div>${rows}
-                </div>`;
+                return '<div class="slot-group">'
+                    + '<div class="slot-group-header">'
+                    + '<div class="slot-group-title">'+time+' PM</div>'
+                    + '<div class="slot-group-meta">'+guestCount+' PEOPLE &bull; '+rows.length+' BOOKING'+(rows.length!==1?'S':'')+'</div>'
+                    + '</div>'
+                    // Print-only column headers (hidden on screen)
+                    + '<div class="print-col-headers">'
+                    + '<div class="print-col-header">Name</div>'
+                    + '<div class="print-col-header">Guests</div>'
+                    + '<div class="print-col-header">Special Requests</div>'
+                    + '</div>'
+                    + rowsHtml + '</div>';
             }).join('');
+
             lucide.createIcons();
         }
 
-        function openEditModal(timestamp) {
-            const index = currentSessionIndex();
-            if (index < 0) return;
-            const booking = state.sessions[index].bookings.find(b => b.timestamp === timestamp);
-            if (!booking) return;
-            document.getElementById('editTimestamp').value = booking.timestamp;
-            document.getElementById('editName').value = booking.name;
-            document.getElementById('editPhone').value = booking.phone;
-            document.getElementById('editGuests').value = booking.guests;
-            document.getElementById('editTime').value = booking.time;
-            document.getElementById('editRequests').value = booking.requests || '';
+        function openEdit(ts) {
+            var i = currentIdx(); if (i < 0) return;
+            var b = state.sessions[i].bookings.find(function(b){ return b.timestamp===ts; });
+            if (!b) return;
+            document.getElementById('editTimestamp').value = b.timestamp;
+            document.getElementById('editName').value      = b.name;
+            document.getElementById('editPhone').value     = b.phone;
+            document.getElementById('editGuests').value    = b.guests;
+            document.getElementById('editTime').value      = b.time;
+            document.getElementById('editRequests').value  = b.requests || '';
             document.getElementById('editModal').classList.add('open');
         }
 
         function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
 
         async function saveEdit() {
-            const payload = {
-                action: 'EDIT',
+            var payload = {
+                action:    'EDIT',
                 timestamp: document.getElementById('editTimestamp').value,
-                name: document.getElementById('editName').value,
-                phone: document.getElementById('editPhone').value,
-                guests: parseInt(document.getElementById('editGuests').value),
-                time: document.getElementById('editTime').value,
-                requests: document.getElementById('editRequests').value
+                name:      document.getElementById('editName').value,
+                phone:     document.getElementById('editPhone').value,
+                guests:    parseInt(document.getElementById('editGuests').value),
+                time:      document.getElementById('editTime').value,
+                requests:  document.getElementById('editRequests').value
             };
-            const index = currentSessionIndex();
-            if (index >= 0) {
-                const booking = state.sessions[index].bookings.find(b => b.timestamp === payload.timestamp);
-                if (booking) Object.assign(booking, payload);
-                renderSessionDetail(index);
-                updateCardBottom(index);
+            var i = currentIdx();
+            if (i >= 0) {
+                var b = state.sessions[i].bookings.find(function(b){ return b.timestamp===payload.timestamp; });
+                if (b) Object.assign(b, payload);
+                renderSessionDetail(i);
+                updateCardBottom(i);
             }
             closeEditModal();
             try {
-                await fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                setTimeout(() => fetchSession(index), 1200);
-            } catch (err) { alert('Save may have failed — please refresh to confirm.'); }
+                await fetch(CONFIG.API_URL, { method:'POST', mode:'no-cors', body:JSON.stringify(payload) });
+                setTimeout(function(){ fetchSession(i); }, 1500);
+            } catch(e) { alert('Save may have failed — please refresh to confirm.'); }
         }
 
-        async function deleteBooking(timestamp) {
+        async function delBooking(ts) {
             if (!confirm('REMOVE THIS BOOKING?')) return;
-            const index = currentSessionIndex();
-            if (index >= 0) {
-                state.sessions[index].bookings = state.sessions[index].bookings.filter(b => b.timestamp !== timestamp);
-                renderSessionDetail(index);
-                updateCardBottom(index);
+            var i = currentIdx();
+            if (i >= 0) {
+                state.sessions[i].bookings = state.sessions[i].bookings.filter(function(b){ return b.timestamp!==ts; });
+                renderSessionDetail(i);
+                updateCardBottom(i);
             }
             try {
-                await fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', timestamp }) });
-                setTimeout(() => fetchSession(index), 1200);
-            } catch (err) { alert('Delete may have failed — please refresh to confirm.'); }
+                await fetch(CONFIG.API_URL, { method:'POST', mode:'no-cors', body:JSON.stringify({action:'DELETE',timestamp:ts}) });
+                setTimeout(function(){ fetchSession(i); }, 1500);
+            } catch(e) { alert('Delete may have failed — please refresh to confirm.'); }
         }
 
-        function esc(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        function esc(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
-        function escAttr(str) { return String(str || '').replace(/'/g, "\\'"); }
+        function escA(s) { return String(s||'').replace(/'/g,"\\'"); }
 
-        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+        document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEditModal(); });
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeEditModal(); });
 
         init();
     </script>
