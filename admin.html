@@ -453,10 +453,25 @@
         }
 
         function openSession(i) {
-            state.currentDate = state.sessions[i].dateStr;
+            var session = state.sessions[i];
+            state.currentDate = session.dateStr;
             document.getElementById('homeView').style.display = 'none';
-            document.getElementById('sessionView').style.display = '';
-            renderSessionDetail(i);
+            document.getElementById('sessionView').style.display = 'block';
+
+            // Show title and spinner immediately
+            document.getElementById('sessionTitle').textContent = session.label;
+            document.getElementById('sessionSubtitle').textContent = 'LOADING...';
+            document.getElementById('printDateLine').textContent =
+                'Printed ' + new Date().toLocaleString('en-NZ') + ' \u2014 ' + session.label;
+            document.getElementById('slotSections').innerHTML =
+                '<div style="padding:3rem 0;text-align:center;">'
+                + '<div style="width:32px;height:32px;border:3px solid rgba(225,216,183,0.1);border-top-color:#C80613;border-radius:50%;animation:sp 0.7s linear infinite;margin:0 auto 1rem;"></div>'
+                + '<div style="font-size:0.75rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;opacity:0.3;">Loading bookings...</div>'
+                + '</div>';
+
+            // Force a fresh fetch every time
+            session.loaded = false;
+            session.bookings = [];
             fetchSession(i);
         }
 
