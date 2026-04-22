@@ -145,7 +145,7 @@
         /* Column header row */
         .booking-col-headers {
             display: grid;
-            grid-template-columns: 2fr 1fr 3fr auto;
+            grid-template-columns: 2fr 1fr 1fr 3fr auto;
             gap: 1rem;
             padding: 0.7rem 1rem;
             border-bottom: 1px solid rgba(225,216,183,0.06);
@@ -159,7 +159,7 @@
         /* Each booking row */
         .booking-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 3fr auto;
+            grid-template-columns: 2fr 1fr 1fr 3fr auto;
             align-items: center;
             gap: 1rem;
             padding: 1.1rem 1rem;
@@ -176,6 +176,7 @@
             font-family: var(--fh); font-size: 1.6rem; color: var(--red); line-height: 1;
         }
         .b-guests-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; }
+        .b-vegs { font-family: var(--fh); font-size: 1.4rem; color: var(--red); line-height: 1; }
         .b-requests { font-size: 0.82rem; font-style: italic; opacity: 0.4; line-height: 1.4; }
         .b-requests.has-note { opacity: 0.8; color: var(--bone); font-style: normal; }
         .b-actions { display: flex; gap: 0.35rem; justify-content: flex-end; }
@@ -250,7 +251,7 @@
 
             /* Print table with clean columns */
             .booking-row {
-                grid-template-columns: 2fr 1fr 3fr !important;
+                grid-template-columns: 2fr 1fr 1fr 3fr !important;
                 border-bottom: 1px solid #ddd !important;
                 padding: 0.7rem 0 !important;
             }
@@ -268,7 +269,7 @@
 
         .print-col-headers {
             display: none;
-            grid-template-columns: 2fr 1fr 3fr;
+            grid-template-columns: 2fr 1fr 1fr 3fr;
             gap: 1rem; padding: 0.5rem 0; margin-bottom: 0.3rem;
             border-bottom: 1px solid #ccc;
         }
@@ -511,6 +512,7 @@
                         return '<div class="booking-row">'
                             + '<div class="b-name">'+esc(b.name)+'</div>'
                             + '<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
+                            + '<div class="b-vegs">'+(b.vegetarians > 0 ? b.vegetarians : '—')+'</div>'
                             + '<div class="b-requests'+(hasNote?' has-note':'')+'">'+( hasNote ? esc(b.requests) : '—' )+'</div>'
                             + '<div class="b-actions">'
                             + '<button class="icon-btn" onclick="openEdit(\''+escA(b.timestamp)+'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
@@ -528,6 +530,7 @@
                     + '<div class="print-col-headers">'
                     + '<div class="print-col-header">Name</div>'
                     + '<div class="print-col-header">Guests</div>'
+                    + '<div class="print-col-header">Vegs</div>'
                     + '<div class="print-col-header">Special Requests</div>'
                     + '</div>'
                     + rowsHtml + '</div>';

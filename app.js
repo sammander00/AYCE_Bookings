@@ -15,7 +15,9 @@ let appState = {
         { time: '6:00', booked: 0, capacity: 30 },
         { time: '6:30', booked: 0, capacity: 30 }
     ],
-    loading: false
+    loading: false,
+    vegCount: 0,
+    vegYes: false
 };
 
 function generateRef() {
@@ -162,6 +164,48 @@ function initGuestSelector() {
 }
 initGuestSelector();
 
+
+// Vegetarian selector
+function initVegSelector() {
+    var sel = document.getElementById('vegSelector');
+    if (!sel) return;
+    sel.innerHTML = '';
+    for (var i = 1; i <= appState.numGuests; i++) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.val = i;
+        btn.textContent = i;
+        btn.classList.toggle('active', i === appState.vegCount);
+        btn.onclick = (function(val) {
+            return function() {
+                appState.vegCount = val;
+                sel.querySelectorAll('button').forEach(function(b) {
+                    b.classList.toggle('active', parseInt(b.dataset.val) === val);
+                });
+                document.getElementById('vegCount').value = val;
+            };
+        })(i);
+        sel.appendChild(btn);
+    }
+}
+
+function setVeg(isYes) {
+    appState.vegYes = isYes;
+    document.getElementById('vegYes').classList.toggle('active', isYes);
+    document.getElementById('vegNo').classList.toggle('active', !isYes);
+    var wrap = document.getElementById('vegCountWrap');
+    if (isYes) {
+        wrap.style.display = 'block';
+        if (appState.vegCount === 0) appState.vegCount = 1;
+        initVegSelector();
+        document.getElementById('vegCount').value = appState.vegCount;
+    } else {
+        wrap.style.display = 'none';
+        appState.vegCount = 0;
+        document.getElementById('vegCount').value = 0;
+    }
+}
+
 elements.bookingForm.addEventListener('submit', handleFormSubmit);
 
 elements.slotBtns.forEach(function(btn) {
@@ -224,6 +268,9 @@ function resetForm() {
     appState.numGuests = 1;
     appState.slots.forEach(function(s) { s.booked = 0; });
     document.getElementById('specialRequests').value = '';
+    appState.vegYes = false;
+    appState.vegCount = 0;
+    setVeg(false);
     updateGuestUI();
     updateSlotsUI();
     showScreen('bookingPage');
@@ -264,6 +311,7 @@ async function handleFormSubmit(e) {
         time:     appState.selectedTime,
         date:     appState.selectedDate,
         requests: document.getElementById('specialRequests').value || '',
+        vegetarians: appState.vegYes ? appState.vegCount : 0,
         ref:      bookingRef,
         manageUrl: manageUrl
     };
