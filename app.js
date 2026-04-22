@@ -1,7 +1,8 @@
 /* Google Sheets Configuration */
 const CONFIG = {
     API_URL: "https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec",
-    CAPACITY_PER_SLOT: 30
+    CAPACITY_PER_SLOT: 30,
+    CACHE_TTL_MS: 60000  // cache is valid for 60 seconds
 };
 
 let appState = {
@@ -24,12 +25,34 @@ function generateRef() {
     return ref;
 }
 
-// Timezone-safe date string — avoids UTC conversion shifting the day in NZ (UTC+12/13)
 function localDateStr(d) {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return yyyy + '-' + mm + '-' + dd;
+}
+
+// ── Cache helpers — store/load availability per date in localStorage ──
+function cacheKey(date) { return 'ayce_avail_' + date; }
+
+function loadFromCache(date) {
+    try {
+        var raw = localStorage.getItem(cacheKey(date));
+        if (!raw) return null;
+        var cached = JSON.parse(raw);
+        // Ignore cache older than TTL
+        if (Date.now() - cached.ts > CONFIG.CACHE_TTL_MS) return null;
+        return cached.availability;
+    } catch(e) { return null; }
+}
+
+function saveToCache(date, availability) {
+    try {
+        localStorage.setItem(cacheKey(date), JSON.stringify({
+            ts: Date.now(),
+            availability: availability
+        }));
+    } catch(e) {}
 }
 
 lucide.createIcons();
@@ -45,24 +68,18 @@ const elements = {
     submitBtn: document.getElementById('submitBtn')
 };
 
-// Initialize Date Picker
 function initDatePicker() {
     const selector = elements.tuesdaySelector;
     selector.innerHTML = '';
 
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 Sun … 2 Tue … 6 Sat
+    const dayOfWeek = now.getDay();
     const hour = now.getHours();
 
-    // Days until the next Tuesday.
-    // If today IS Tuesday and before 8 pm, offset = 0 (show today).
-    // If today IS Tuesday at/after 8 pm, jump 7 days.
     let offset = (2 - dayOfWeek + 7) % 7;
     if (offset === 0 && hour >= 20) offset = 7;
 
-    // Use noon local time to avoid any DST edge cases
     let base = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12, 0, 0);
-
     const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
     let firstBtn = null;
     let firstDateStr = null;
@@ -85,9 +102,9 @@ function initDatePicker() {
                 selector.querySelectorAll('.selector-btn').forEach(function(b) { b.classList.remove('active'); });
                 btn.classList.add('active');
                 elements.dateError.style.display = 'none';
-                // Reset slot counts when switching date
                 appState.slots.forEach(function(s) { s.booked = 0; });
-                updateSlotsUI();
+                // Show cached data instantly, then refresh in background
+                applyCachedData(ds);
                 refreshData();
             };
         })(dateStr);
@@ -100,17 +117,31 @@ function initDatePicker() {
         }
     }
 
-    // Auto-select first Tuesday and fetch immediately
     if (firstBtn) {
         firstBtn.classList.add('active');
         appState.selectedDate = firstDateStr;
         elements.sessionDate.value = firstDateStr;
+        // Show cached data immediately (zero wait), then fetch fresh
+        applyCachedData(firstDateStr);
         refreshData();
     }
 }
 initDatePicker();
 
-// Generate 15 Guest Buttons
+// Apply cached availability instantly — no spinner, no "LOADING..."
+function applyCachedData(date) {
+    var cached = loadFromCache(date);
+    if (cached) {
+        cached.forEach(function(slot) {
+            var match = appState.slots.find(function(s) { return s.time === slot.time; });
+            if (match) match.booked = slot.totalBooked;
+        });
+        updateSlotsUI();
+    }
+    // If no cache yet, show a subtle pulsing state (not "LOADING...")
+    // slots will just show current state until fetch completes
+}
+
 function initGuestSelector() {
     elements.guestSelector.innerHTML = '';
     for (var i = 1; i <= 15; i++) {
@@ -226,14 +257,14 @@ async function handleFormSubmit(e) {
     var manageUrl = window.location.href.replace(/\/[^\/]*$/, '/') + 'manage.html?ref=' + bookingRef;
 
     var formData = {
-        name: document.getElementById('custName').value,
-        phone: document.getElementById('custPhone').value,
-        email: document.getElementById('custEmail').value,
-        guests: appState.numGuests,
-        time: appState.selectedTime,
-        date: appState.selectedDate,
+        name:     document.getElementById('custName').value,
+        phone:    document.getElementById('custPhone').value,
+        email:    document.getElementById('custEmail').value,
+        guests:   appState.numGuests,
+        time:     appState.selectedTime,
+        date:     appState.selectedDate,
         requests: document.getElementById('specialRequests').value || '',
-        ref: bookingRef,
+        ref:      bookingRef,
         manageUrl: manageUrl
     };
 
@@ -246,10 +277,21 @@ async function handleFormSubmit(e) {
             headers: { 'Content-Type': 'application/json' }
         });
 
+        // Optimistically update local state and cache immediately
+        // so the counter updates right away without waiting for a re-fetch
+        var slot = appState.slots.find(function(s) { return s.time === formData.time; });
+        if (slot) slot.booked += formData.guests;
+        updateSlotsUI();
+        // Bust the cache for this date so next load is fresh
+        try { localStorage.removeItem(cacheKey(appState.selectedDate)); } catch(e) {}
+
         document.getElementById('successEmail').textContent = formData.email;
         document.getElementById('successRef').textContent = bookingRef;
         showScreen('successPage');
+
+        // Refresh in background to get authoritative count
         refreshData();
+
     } catch (err) {
         console.error('Booking failed:', err);
         alert('Something went wrong. Please check your connection to the flames.');
@@ -260,14 +302,11 @@ async function handleFormSubmit(e) {
 
 async function refreshData() {
     if (!appState.selectedDate) return;
-
-    elements.slotBtns.forEach(function(btn) {
-        btn.querySelector('.availability').textContent = 'LOADING...';
-    });
+    var date = appState.selectedDate;
 
     try {
         var url = new URL(CONFIG.API_URL);
-        url.searchParams.set('date', appState.selectedDate);
+        url.searchParams.set('date', date);
         var response = await fetch(url);
         var data = await response.json();
 
@@ -276,12 +315,17 @@ async function refreshData() {
                 var match = appState.slots.find(function(s) { return s.time === slot.time; });
                 if (match) match.booked = slot.totalBooked;
             });
+            // Save to cache for instant display next time
+            saveToCache(date, data.availability);
         }
     } catch (err) {
         console.error('Error refreshing data:', err);
     }
 
-    updateSlotsUI();
+    // Only update UI if the user hasn't switched to a different date
+    if (appState.selectedDate === date) {
+        updateSlotsUI();
+    }
 }
 
 function setLoading(isLoading) {
