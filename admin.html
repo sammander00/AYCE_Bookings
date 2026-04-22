@@ -145,7 +145,7 @@
         /* Column header row */
         .booking-col-headers {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 3fr auto;
+            grid-template-columns: 2fr 1fr 1fr auto;
             gap: 1rem;
             padding: 0.7rem 1rem;
             border-bottom: 1px solid rgba(225,216,183,0.06);
@@ -159,7 +159,7 @@
         /* Each booking row */
         .booking-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 3fr auto;
+            grid-template-columns: 2fr 1fr 1fr auto;
             align-items: center;
             gap: 1rem;
             padding: 1.1rem 1rem;
@@ -177,8 +177,6 @@
         }
         .b-guests-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; }
         .b-vegs { font-family: var(--fh); font-size: 1.4rem; color: var(--red); line-height: 1; }
-        .b-requests { font-size: 0.82rem; font-style: italic; opacity: 0.4; line-height: 1.4; }
-        .b-requests.has-note { opacity: 0.8; color: var(--bone); font-style: normal; }
         .b-actions { display: flex; gap: 0.35rem; justify-content: flex-end; }
 
         .icon-btn {
@@ -251,15 +249,13 @@
 
             /* Print table with clean columns */
             .booking-row {
-                grid-template-columns: 2fr 1fr 1fr 3fr !important;
+                grid-template-columns: 2fr 1fr 1fr !important;
                 border-bottom: 1px solid #ddd !important;
                 padding: 0.7rem 0 !important;
             }
             .b-name { color: black; font-size: 0.9rem; }
             .b-guests { color: #C80613; font-size: 1.2rem; }
             .b-guests-label { color: #999; opacity: 1; }
-            .b-requests { color: #444; opacity: 1; font-style: italic; }
-            .b-requests.has-note { color: #111; opacity: 1; font-style: normal; }
 
             /* Print header row */
             .print-col-headers { display: grid !important; }
@@ -269,7 +265,7 @@
 
         .print-col-headers {
             display: none;
-            grid-template-columns: 2fr 1fr 1fr 3fr;
+            grid-template-columns: 2fr 1fr 1fr;
             gap: 1rem; padding: 0.5rem 0; margin-bottom: 0.3rem;
             border-bottom: 1px solid #ccc;
         }
@@ -286,7 +282,6 @@
             .wrap { margin: 1rem; padding: 1.5rem; }
             .session-header { flex-direction: column; align-items: flex-start; }
             .booking-row { grid-template-columns: 1fr auto !important; row-gap: 0.3rem; }
-            .b-requests { grid-column: 1 / -1; }
             .b-actions { grid-column: 1 / -1; }
             .booking-col-headers { display: none; }
         }
@@ -357,7 +352,6 @@
                     <option value="6:30">6:30 PM</option>
                 </select>
             </div>
-            <div class="modal-field"><label>Special Requests</label><textarea id="editRequests" placeholder="Dietary needs, accessibility, etc."></textarea></div>
             <div class="modal-btns">
                 <button class="btn-solid" onclick="saveEdit()">SAVE CHANGES</button>
                 <button class="btn-outline" onclick="closeEditModal()">CANCEL</button>
@@ -508,12 +502,10 @@
 
                 var rowsHtml = rows.length > 0
                     ? rows.map(function(b) {
-                        var hasNote = b.requests && b.requests.trim().length > 0;
                         return '<div class="booking-row">'
                             + '<div class="b-name">'+esc(b.name)+'</div>'
                             + '<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
                             + '<div class="b-vegs">'+(b.vegetarians > 0 ? b.vegetarians : '—')+'</div>'
-                            + '<div class="b-requests'+(hasNote?' has-note':'')+'">'+( hasNote ? esc(b.requests) : '—' )+'</div>'
                             + '<div class="b-actions">'
                             + '<button class="icon-btn" onclick="openEdit(\''+escA(b.timestamp)+'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
                             + '<button class="icon-btn del" onclick="delBooking(\''+escA(b.timestamp)+'\')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
@@ -531,7 +523,6 @@
                     + '<div class="print-col-header">Name</div>'
                     + '<div class="print-col-header">Guests</div>'
                     + '<div class="print-col-header">Vegs</div>'
-                    + '<div class="print-col-header">Special Requests</div>'
                     + '</div>'
                     + rowsHtml + '</div>';
             }).join('');
@@ -548,7 +539,6 @@
             document.getElementById('editPhone').value     = b.phone;
             document.getElementById('editGuests').value    = b.guests;
             document.getElementById('editTime').value      = b.time;
-            document.getElementById('editRequests').value  = b.requests || '';
             document.getElementById('editModal').classList.add('open');
         }
 
@@ -562,7 +552,6 @@
                 phone:     document.getElementById('editPhone').value,
                 guests:    parseInt(document.getElementById('editGuests').value),
                 time:      document.getElementById('editTime').value,
-                requests:  document.getElementById('editRequests').value
             };
             var i = currentIdx();
             if (i >= 0) {
