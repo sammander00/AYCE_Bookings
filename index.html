@@ -228,7 +228,7 @@
 
                 <!-- RIGHT COLUMN -->
                 <div class="form-slots">
-                    <label><i data-lucide="clock"></i> Choose Arrival Time</label>
+                    <label class="input-group-label"><i data-lucide="clock"></i> Choose Arrival Time</label>
                     <div class="slots-container" id="slotsContainer">
                         <button type="button" class="slot-btn" data-time="5:30">
                             <span class="time">5:30 PM</span>
@@ -319,7 +319,7 @@
     <script>
         // ── Leaflet interactive map ──
         var map = L.map('hellMap', {
-            center: [-41.2940, 174.7758],
+            center: [-41.28895892295822, 174.7754539576719],
             zoom: 17,
             scrollWheelZoom: false,
             zoomControl: true
@@ -347,7 +347,7 @@
             popupAnchor: [0, -38]
         });
 
-        var marker = L.marker([-41.2940, 174.7758], { icon: hellIcon }).addTo(map);
+        var marker = L.marker([-41.28895892295822, 174.7754539576719], { icon: hellIcon }).addTo(map);
 
         marker.bindPopup(
             '<div style="font-family:Arial,sans-serif;text-align:center;padding:4px 8px;">'

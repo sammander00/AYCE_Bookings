@@ -157,9 +157,8 @@ function initGuestSelector() {
                 appState.numGuests = val;
                 updateGuestUI();
                 updateSlotsUI();
-                // Keep veg count capped to guest count and refresh selector
+                // Rebuild veg selector to match new guest count
                 if (appState.vegYes) {
-                    if (appState.vegCount > appState.numGuests) appState.vegCount = appState.numGuests;
                     initVegSelector();
                 }
             };
@@ -170,11 +169,15 @@ function initGuestSelector() {
 initGuestSelector();
 
 
-// Vegetarian selector
+// Vegetarian selector — rebuilds buttons up to current guest count
 function initVegSelector() {
     var sel = document.getElementById('vegSelector');
     if (!sel) return;
     sel.innerHTML = '';
+    // Cap vegCount to current numGuests
+    if (appState.vegCount > appState.numGuests) appState.vegCount = appState.numGuests;
+    if (appState.vegCount < 1) appState.vegCount = 1;
+    document.getElementById('vegCount').value = appState.vegCount;
     for (var i = 1; i <= appState.numGuests; i++) {
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -184,7 +187,7 @@ function initVegSelector() {
         btn.onclick = (function(val) {
             return function() {
                 appState.vegCount = val;
-                sel.querySelectorAll('button').forEach(function(b) {
+                document.getElementById('vegSelector').querySelectorAll('button').forEach(function(b) {
                     b.classList.toggle('active', parseInt(b.dataset.val) === val);
                 });
                 document.getElementById('vegCount').value = val;
@@ -201,9 +204,7 @@ function setVeg(isYes) {
     var wrap = document.getElementById('vegCountWrap');
     if (isYes) {
         wrap.style.display = 'block';
-        if (appState.vegCount === 0) appState.vegCount = 1;
         initVegSelector();
-        document.getElementById('vegCount').value = appState.vegCount;
     } else {
         wrap.style.display = 'none';
         appState.vegCount = 0;
@@ -272,7 +273,6 @@ function resetForm() {
     appState.selectedTime = null;
     appState.numGuests = 1;
     appState.slots.forEach(function(s) { s.booked = 0; });
-    document.getElementById('specialRequests').value = '';
     appState.vegYes = false;
     appState.vegCount = 0;
     setVeg(false);
@@ -315,7 +315,6 @@ async function handleFormSubmit(e) {
         guests:   appState.numGuests,
         time:     appState.selectedTime,
         date:     appState.selectedDate,
-        requests: document.getElementById('specialRequests').value || '',
         vegetarians: appState.vegYes ? appState.vegCount : 0,
         ref:      bookingRef,
         manageUrl: manageUrl
