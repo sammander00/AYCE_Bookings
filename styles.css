@@ -196,29 +196,35 @@ input:focus {
 }
 
 .selector-btn {
-    padding: 1.2rem;
+    padding: 1.6rem 1.2rem;
     background: transparent;
-    border: 1px solid var(--hell-bone);
+    border: 1px solid rgba(225, 216, 183, 0.2);
     color: var(--hell-bone);
     cursor: pointer;
     text-align: center;
     transition: all 0.2s var(--transition);
-    border-radius: 0; /* Boxy look like Hell site */
+    border-radius: 0;
     text-transform: uppercase;
+}
+
+.selector-btn:hover:not(.active) {
+    border-color: rgba(225, 216, 183, 0.4);
+    background: rgba(225, 216, 183, 0.03);
 }
 
 .selector-btn .date-day {
     display: block;
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     font-weight: 700;
 }
 
 .selector-btn .date-month {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     opacity: 0.6;
     letter-spacing: 0.1em;
+    margin-top: 0.2rem;
 }
 
 .selector-btn.active {
