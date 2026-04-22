@@ -692,11 +692,11 @@
             let daysUntil = (2 - dayOfWeek + 7) % 7;
             if (daysUntil === 0 && d.getHours() >= 20) daysUntil = 7;
             d.setDate(d.getDate() + daysUntil);
-            d.setHours(0,0,0,0);
+            d.setHours(12,0,0,0);
             for (let i = 0; i < 4; i++) {
                 const copy = new Date(d);
                 tuesdays.push({
-                    dateStr: copy.toISOString().split('T')[0],
+                    dateStr: (function(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })(copy),
                     day: copy.getDate(),
                     month: MONTHS[copy.getMonth()],
                     year: copy.getFullYear(),
