@@ -248,7 +248,7 @@
                     <!-- MAP under time slots -->
                     <div class="map-group">
                         <label><i data-lucide="map-pin"></i> Where to Find Us</label>
-                        <p class="map-address">14 Bond Street, Te Aro, Wellington</p>
+                        <p class="map-address">12 Bond Street, Te Aro, Wellington</p>
                         <div id="hellMap" class="map-embed"></div>
                     </div>
 
@@ -319,15 +319,15 @@
     <script>
         // ── Leaflet interactive map ──
         var map = L.map('hellMap', {
-            center: [-41.2933, 174.7762],
+            center: [-41.2940, 174.7758],
             zoom: 17,
             scrollWheelZoom: false,
             zoomControl: true
         });
 
         // Dark-styled tiles from CartoDB
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
             maxZoom: 19
         }).addTo(map);
 
@@ -347,13 +347,13 @@
             popupAnchor: [0, -38]
         });
 
-        var marker = L.marker([-41.2933, 174.7762], { icon: hellIcon }).addTo(map);
+        var marker = L.marker([-41.2940, 174.7758], { icon: hellIcon }).addTo(map);
 
         marker.bindPopup(
             '<div style="font-family:Arial,sans-serif;text-align:center;padding:4px 8px;">'
             + '<strong style="font-size:13px;color:#C80613;">HELL PIZZA BOND ST</strong><br>'
             + '<span style="font-size:11px;color:#555;">14 Bond Street, Te Aro</span><br>'
-            + '<a href="https://maps.google.com/?q=14+Bond+Street+Wellington" target="_blank" '
+            + '<a href="https://maps.google.com/?q=12+Bond+Street+Wellington" target="_blank" '
             + 'style="font-size:11px;color:#C80613;">Open in Google Maps →</a>'
             + '</div>',
             { maxWidth: 200 }

@@ -157,6 +157,11 @@ function initGuestSelector() {
                 appState.numGuests = val;
                 updateGuestUI();
                 updateSlotsUI();
+                // Keep veg count capped to guest count and refresh selector
+                if (appState.vegYes) {
+                    if (appState.vegCount > appState.numGuests) appState.vegCount = appState.numGuests;
+                    initVegSelector();
+                }
             };
         })(i);
         elements.guestSelector.appendChild(btn);
