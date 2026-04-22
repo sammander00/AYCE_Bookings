@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 
 var SHEET_NAME  = 'Bookings';
+var CTRL_SHEET  = 'Controls';
 var CAPACITY    = 30;
 var SLOTS       = ['5:30', '6:00', '6:30'];
 var FROM_NAME   = 'Hell Pizza Bond St';
@@ -59,11 +60,17 @@ function doGet(e) {
       return respond(getBookingByRef(sheet, params.ref));
     }
 
+    if (params.controls) {
+      return respond({ controls: loadControls() });
+    }
+
     var date         = params.date || '';
     var availability = getAvailability(sheet, date);
     var bookings     = date ? getBookingsForDate(sheet, date) : [];
 
-    return respond({ availability: availability, bookings: bookings });
+    var controls = loadControls();
+    var dateCtrl = (controls && controls[date]) ? controls[date] : { blocked: false, stoppedSlots: [] };
+    return respond({ availability: availability, bookings: bookings, blocked: dateCtrl.blocked, stoppedSlots: dateCtrl.stoppedSlots || [] });
 
   } catch(err) {
     return respond({ error: err.toString() });
@@ -82,6 +89,7 @@ function doPost(e) {
     else if (action === 'EDIT')   editBooking(sheet, data);
     else if (action === 'DELETE') deleteBooking(sheet, data.timestamp, data.ref);
     else if (action === 'CHANGE') changeBookingSession(sheet, data);
+    else if (action === 'SAVE_CONTROLS') saveControls(data.controls);
 
     return respond({ success: true });
 
@@ -299,6 +307,32 @@ function sendChangeEmail(data) {
   MailApp.sendEmail({ to: data.email, subject: subject, htmlBody: html, name: FROM_NAME });
 }
 
+
+// ── CONTROLS ─────────────────────────────────────────────────
+function getCtrlSheet() {
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(CTRL_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(CTRL_SHEET);
+    sheet.appendRow(['controls_json']);
+  }
+  return sheet;
+}
+
+function loadControls() {
+  try {
+    var sheet = getCtrlSheet();
+    var data  = sheet.getRange(2, 1).getValue();
+    return data ? JSON.parse(data) : {};
+  } catch(e) { return {}; }
+}
+
+function saveControls(controls) {
+  var sheet = getCtrlSheet();
+  // Ensure row 2 exists
+  if (sheet.getLastRow() < 2) sheet.appendRow(['']);
+  sheet.getRange(2, 1).setValue(JSON.stringify(controls));
+}
 
 // ── HELPERS ───────────────────────────────────────────────────
 function getSheet() {

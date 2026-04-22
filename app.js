@@ -237,7 +237,7 @@ function updateSlotsUI() {
         var remaining = slot ? (slot.capacity - slot.booked) : 30;
         var availText = btn.querySelector('.availability');
 
-        if (remaining <= 0) {
+        if (remaining <= 0 || slot.forcedSoldOut) {
             btn.classList.add('disabled');
             btn.classList.remove('active', 'urgent');
             availText.textContent = 'SOLD OUT';
@@ -365,9 +365,13 @@ async function refreshData() {
         if (data.availability) {
             data.availability.forEach(function(slot) {
                 var match = appState.slots.find(function(s) { return s.time === slot.time; });
-                if (match) match.booked = slot.totalBooked;
+                if (match) {
+                    match.booked = slot.totalBooked;
+                    // If whole date is blocked OR this slot is stopped, mark as sold out
+                    match.forcedSoldOut = data.blocked ||
+                        (data.stoppedSlots && data.stoppedSlots.indexOf(slot.time) >= 0);
+                }
             });
-            // Save to cache for instant display next time
             saveToCache(date, data.availability);
         }
     } catch (err) {
