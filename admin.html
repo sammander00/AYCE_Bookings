@@ -505,7 +505,7 @@
                         return '<div class="booking-row">'
                             + '<div class="b-name">'+esc(b.name)+'</div>'
                             + '<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
-                            + '<div class="b-vegs">'+(b.vegetarians > 0 ? b.vegetarians : '—')+'</div>'
+                            + '<div><div class="b-vegs">'+(b.vegetarians > 0 ? b.vegetarians : '—')+'</div><div class="b-guests-label">vegs</div></div>'
                             + '<div class="b-actions">'
                             + '<button class="icon-btn" onclick="openEdit(\''+escA(b.timestamp)+'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
                             + '<button class="icon-btn del" onclick="delBooking(\''+escA(b.timestamp)+'\')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
