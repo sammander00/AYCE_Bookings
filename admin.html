@@ -117,7 +117,7 @@
         .modal-box::before{content:'';position:absolute;top:50%;left:50%;width:60%;height:40%;background:var(--red);filter:blur(80px);opacity:.08;transform:translate(-50%,-50%);pointer-events:none;}
         .modal-box>*{position:relative;z-index:1;}
         .modal-title{font-family:var(--fh);font-size:2.2rem;letter-spacing:.06em;margin-bottom:2rem;}
-        .modal-field{margin-bottom:1.2rem;}
+        .modal-field{margin-bottom:0.9rem;}
         .modal-field label{display:block;font-size:.75rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;opacity:.5;margin-bottom:.45rem;}
         .modal-field input,.modal-field select{width:100%;background:rgba(225,216,183,.03);border:1px solid rgba(225,216,183,.15);border-radius:2px;color:var(--bone);padding:1rem 1.2rem;font-size:.95rem;font-family:var(--fb);transition:all .3s;}
         .modal-field select{background:#1a1a1a;}
@@ -240,13 +240,16 @@
         .nb-date-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
         .nb-date-btn.active .nb-month{opacity:.8;}
         .nb-time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;}
-        .nb-time-btn{padding:1rem;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-family:var(--fh);font-size:1.4rem;letter-spacing:.05em;cursor:pointer;transition:all .2s;}
+        .nb-time-btn{padding:.8rem 1rem .6rem;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-family:var(--fh);font-size:1.4rem;letter-spacing:.05em;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
         .nb-time-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
-        .nb-guests-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;align-items:stretch;}
-        .nb-guest-btn{aspect-ratio:1;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+        .nb-time-count{font-size:.65rem;font-weight:700;letter-spacing:.1em;font-family:'Roboto',sans-serif;opacity:.55;}
+        .nb-time-btn.active .nb-time-count{opacity:.7;color:#151515;}
+        .nb-time-btn.full{opacity:.5;cursor:not-allowed;}
+        .nb-guests-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;}
+        .nb-guest-btn{height:44px;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
         .nb-guest-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
         .nb-guest-btn.zero{opacity:.4;}
-        .nb-custom-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(225,216,183,.15);padding:.3rem .4rem;cursor:pointer;transition:all .2s;min-width:0;}
+        .nb-custom-wrap{height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(225,216,183,.15);padding:.2rem .4rem;cursor:pointer;transition:all .2s;min-width:0;}
         .nb-custom-wrap.active{border-color:var(--red);background:rgba(200,6,19,.08);}
         .nb-custom-label{font-size:.5rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;opacity:.4;margin-bottom:.2rem;white-space:nowrap;}
         .nb-custom-input{width:100%;background:transparent;border:none;color:var(--bone);font-size:1rem;font-weight:700;text-align:center;outline:none;padding:0;}
@@ -329,7 +332,7 @@
 
 <!-- NEW BOOKING MODAL -->
 <div class="modal-backdrop" id="newBookingModal">
-    <div class="modal-box" style="max-width:520px;">
+    <div class="modal-box" style="max-width:480px;padding:2rem;">
         <h2 class="modal-title">NEW BOOKING</h2>
 
         <!-- Date selector -->
@@ -341,11 +344,7 @@
         <!-- Time selector -->
         <div class="modal-field">
             <label>Arrival Time <span style="color:var(--red)">*</span></label>
-            <div class="nb-time-grid" id="nbTimeGrid">
-                <button type="button" class="nb-time-btn" data-time="5:30" onclick="nbSelectTime('5:30')">5:30 PM</button>
-                <button type="button" class="nb-time-btn" data-time="6:00" onclick="nbSelectTime('6:00')">6:00 PM</button>
-                <button type="button" class="nb-time-btn" data-time="6:30" onclick="nbSelectTime('6:30')">6:30 PM</button>
-            </div>
+            <div class="nb-time-grid" id="nbTimeGrid"></div>
         </div>
 
         <!-- Name -->
@@ -411,6 +410,7 @@
 <script>
 
 var SB_URL = 'https://zmhfympqxvdkotyjzvuk.supabase.co';
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec';
 var SB_KEY = 'sb_publishable_I5WfIE7qy58qjLz6TsvqVw_ZI60hNDW';
 var SLOTS  = ['5:30','6:00','6:30'];
 var CAPACITY = 30;
@@ -798,9 +798,33 @@ showHome = function() {
 // -- NEW BOOKING --
 var nb = { date: null, time: null, guests: 1, vegs: 0 };
 
+function buildNbTimes(){
+    var grid = document.getElementById('nbTimeGrid');
+    if (!grid) return;
+    var CAPACITY = 30;
+    var slots = ['5:30', '6:00', '6:30'];
+    grid.innerHTML = slots.map(function(t) {
+        // Find count from the current selected date session
+        var count = 0;
+        if (nb.date) {
+            var session = state.sessions.find(function(s){ return s.dateStr === nb.date; });
+            if (session && session.bookings) {
+                count = session.bookings.reduce(function(acc,b){ return b.time===t ? acc+(parseInt(b.guests)||0) : acc; }, 0);
+            }
+        }
+        var full = count >= CAPACITY;
+        var isActive = nb.time === t;
+        return '<button type="button" class="nb-time-btn' + (isActive?' active':'') + (full?' full':'') + '" data-time="' + t + '" onclick="nbSelectTime(\'' + t + '\')">'
+            + t + ' PM'
+            + '<span class="nb-time-count">' + count + '/' + CAPACITY + '</span>'
+            + '</button>';
+    }).join('');
+}
+
 function openNewBooking(){
     nb = { date: null, time: null, guests: 1, vegs: 0 };
     buildNbDates();
+    buildNbTimes();
     buildNbGuests();
     buildNbVegs();
     document.getElementById('nbName').value = '';
@@ -832,6 +856,7 @@ function buildNbDates(){
 function nbSelectDate(dateStr){
     nb.date = dateStr;
     buildNbDates();
+    buildNbTimes();
 }
 
 function nbSelectTime(time){
@@ -936,6 +961,27 @@ async function submitNewBooking(){
                 ref:         ref
             })
         });
+
+        // Send confirmation email if customer email was provided
+        if (email) {
+            var manageUrl = 'https://aycepizza.bond/manage.html?ref=' + ref;
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action:      'EMAIL_ONLY',
+                    name:        name,
+                    email:       email,
+                    phone:       phone,
+                    date:        nb.date,
+                    time:        nb.time,
+                    guests:      nb.guests,
+                    vegetarians: nb.vegs,
+                    ref:         ref,
+                    manageUrl:   manageUrl
+                })
+            });
+        }
 
         closeNewBooking();
 
