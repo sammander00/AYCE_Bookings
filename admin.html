@@ -163,10 +163,15 @@
         .nb-time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;}
         .nb-time-btn{padding:1rem;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-family:var(--fh);font-size:1.4rem;letter-spacing:.05em;cursor:pointer;transition:all .2s;}
         .nb-time-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
-        .nb-guests-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;}
+        .nb-guests-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;align-items:stretch;}
         .nb-guest-btn{aspect-ratio:1;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
         .nb-guest-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
         .nb-guest-btn.zero{opacity:.4;}
+        .nb-custom-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(225,216,183,.15);padding:.3rem .4rem;cursor:pointer;transition:all .2s;min-width:0;}
+        .nb-custom-wrap.active{border-color:var(--red);background:rgba(200,6,19,.08);}
+        .nb-custom-label{font-size:.5rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;opacity:.4;margin-bottom:.2rem;white-space:nowrap;}
+        .nb-custom-input{width:100%;background:transparent;border:none;color:var(--bone);font-size:1rem;font-weight:700;text-align:center;outline:none;padding:0;}
+        .nb-custom-input::placeholder{opacity:.3;}
     </style>
 </head>
 <body>
@@ -587,13 +592,37 @@ function buildNbGuests(){
         btn.className='nb-guest-btn'+(i===nb.guests?' active':'');
         btn.onclick=(function(val){ return function(){
             nb.guests=val;
-            // Cap vegs to new guest count
             if(nb.vegs>val) nb.vegs=0;
             buildNbGuests();
             buildNbVegs();
         };})(i);
         grid.appendChild(btn);
     }
+    // Custom number input card for 16+
+    var wrap=document.createElement('div');
+    var isCustom = nb.guests > 15;
+    wrap.className='nb-custom-wrap'+(isCustom?' active':'');
+    wrap.innerHTML='<div class="nb-custom-label">16+</div>'
+        +'<input class="nb-custom-input" id="nbCustomGuests" type="number" min="16" max="200" placeholder="—" value="'+(isCustom?nb.guests:'')+'">';
+    grid.appendChild(wrap);
+
+    // Wire up the custom input
+    var inp = wrap.querySelector('#nbCustomGuests');
+    inp.addEventListener('focus', function(){
+        // Deselect the number buttons
+        nb.guests = 16;
+        buildNbGuests();
+        document.getElementById('nbCustomGuests').focus();
+    });
+    inp.addEventListener('input', function(){
+        var val = parseInt(this.value);
+        if(val >= 16) {
+            nb.guests = val;
+            if(nb.vegs > val) nb.vegs = 0;
+            wrap.classList.add('active');
+            buildNbVegs();
+        }
+    });
 }
 
 function buildNbVegs(){
