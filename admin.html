@@ -682,29 +682,16 @@ async function saveEdit(){
         await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});
         await logAction(ref,'EDIT','staff',payload.name,{before:before,after:{date:payload.date,time:payload.time,guests:payload.guests}});
         logsState.loaded=false;
-        // Refresh the original session
         setTimeout(function(){
             fetchSession(i);
-            // If date changed, also refresh the destination session
-            if(before.date && before.date !== payload.date) {
-                var destIdx = state.sessions.findIndex(function(s){ return s.dateStr === payload.date; });
-                if(destIdx >= 0 && destIdx !== i) fetchSession(destIdx);
+            if(before.date && before.date !== payload.date){
+                var destIdx=state.sessions.findIndex(function(s){return s.dateStr===payload.date;});
+                if(destIdx>=0 && destIdx!==i) fetchSession(destIdx);
             }
         }, 500);
     }
     catch(e){alert('Save may have failed -- please refresh.');}
 }
-
-    closeEditModal();
-    try{
-        await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});
-        await logAction(ref,'EDIT','staff',payload.name,{before:before,after:{date:payload.date,time:payload.time,guests:payload.guests}});
-        logsState.loaded=false;
-        setTimeout(function(){fetchSession(i);},500);
-    }
-    catch(e){alert('Save may have failed -- please refresh.');}
-}
-
 
 // -- DELETE --
 async function delBooking(ref){
@@ -1254,7 +1241,7 @@ if (sessionStorage.getItem(SESSION_KEY) === '1') {
 }
 
 // -- REALTIME SUBSCRIPTION --
-// Supabase pushes changes instantly — no polling needed
+// Supabase pushes changes instantly -- no polling needed
 var supabaseClient = null;
 
 function initRealtime() {
@@ -1303,7 +1290,7 @@ function startPollingFallback() {
     }, 10000);
 }
 
-// Start realtime — falls back to 10s polling automatically if it fails
+// Start realtime -- falls back to 10s polling automatically if it fails
 initRealtime();
 
 // Keep polling as a safety net regardless (catches edge cases realtime misses)
