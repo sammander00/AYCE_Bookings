@@ -557,7 +557,8 @@ function buildNbDates(){
     var grid = document.getElementById('nbDateGrid');
     var MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     grid.innerHTML = state.sessions.map(function(s){
-        return '<button type="button" class="nb-date-btn'+(nb.date===s.dateStr?' active':'')+'" onclick="nbSelectDate(''+s.dateStr+'')">'
+        return '<button type="button" class="nb-date-btn'+(nb.date===s.dateStr?' active':'')+'" data-date="'+s.dateStr+'" onclick="nbSelectDate(\''+s.dateStr+'\')">'
+
             +'<span class="nb-day">'+s.day+'</span>'
             +'<span class="nb-month">'+s.month+'</span>'
             +'</button>';
@@ -566,9 +567,6 @@ function buildNbDates(){
 
 function nbSelectDate(dateStr){
     nb.date = dateStr;
-    document.querySelectorAll('.nb-date-btn').forEach(function(b){
-        b.classList.toggle('active', b.onclick.toString().indexOf(dateStr) >= 0);
-    });
     buildNbDates();
 }
 
