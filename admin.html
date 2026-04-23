@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Bebas+Neue&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { --red:#C80613; --bone:#E1D8B7; --black:#151515; --fh:'Bebas Neue',cursive; --fd:'Pirata One',cursive; --fb:'Roboto',sans-serif; }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
@@ -152,7 +151,7 @@
         .print-date-line{display:none;font-size:.75rem;color:#999;margin-bottom:1.5rem;font-style:italic;}
         @media(max-width:800px){.tuesday-grid{grid-template-columns:1fr;}.wrap{margin:1rem;padding:1.5rem;}.block-dates,.dev-date-grid{grid-template-columns:repeat(2,1fr);}}
 
-        /* ── LOGIN SCREEN ── */
+        /* -- LOGIN SCREEN -- */
         #loginScreen {
             position: fixed; inset: 0;
             background: #151515;
@@ -212,7 +211,7 @@
             75%{transform:translateX(6px)}
         }
 
-        /* ── PAST SESSIONS ── */
+        /* -- PAST SESSIONS -- */
         .view-tabs { display:flex; gap:0; margin-bottom:2.5rem; border-bottom:1px solid rgba(225,216,183,0.1); }
         .view-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--bone); font-family:var(--fh); font-size:1.1rem; letter-spacing:0.15em; padding:0.6rem 1.5rem 0.8rem; cursor:pointer; opacity:0.35; transition:all 0.2s; margin-bottom:-1px; }
         .view-tab.active { opacity:1; border-bottom-color:var(--red); color:var(--bone); }
@@ -284,7 +283,7 @@
     <div class="dev-panel" id="devPanel">
         <div class="dev-panel-title"><i data-lucide="settings" size="16"></i>SESSION CONTROLS</div>
         <div class="dev-section">
-            <div class="dev-section-title">Stop bookings — select date then toggle slots</div>
+            <div class="dev-section-title">Stop bookings -- select date then toggle slots</div>
             <div class="dev-date-grid" id="devDateSelector"></div>
             <div class="slot-toggles" id="slotToggles"></div>
         </div>
@@ -354,7 +353,7 @@
             <label>Name</label>
             <input type="text" id="nbName" placeholder="Full name" autocomplete="off">
         </div>
-        <!-- Phone + Email side by side — at least one required -->
+        <!-- Phone + Email side by side -- at least one required -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
             <div class="modal-field">
                 <label>Phone or Email <span style="color:var(--red)">*</span> <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(or email)</span></label>
@@ -408,7 +407,9 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script>
+
 var SB_URL = 'https://zmhfympqxvdkotyjzvuk.supabase.co';
 var SB_KEY = 'sb_publishable_I5WfIE7qy58qjLz6TsvqVw_ZI60hNDW';
 var SLOTS  = ['5:30','6:00','6:30'];
@@ -441,9 +442,8 @@ function getCtrl(d){ if(!state.controls[d]) state.controls[d]={blocked:false,sto
 function isBlocked(d){ return getCtrl(d).blocked; }
 function isStopped(d,t){ return getCtrl(d).stoppedSlots.indexOf(t)>=0; }
 
-lucide.createIcons();
-
 async function init(){
+    lucide.createIcons();
     state.sessions=getUpcomingTuesdays().map(function(t){return Object.assign({},t,{bookings:[],loaded:false});});
     // Load controls from Supabase
     try{
@@ -478,7 +478,7 @@ function renderCardBottom(s){
         var c=slotBooked(s,t), stopped=isStopped(s.dateStr,t);
         return '<div class="mini-slot'+(stopped?' stopped':c>0?' active':'')+'"><div class="mini-dot"></div>'+t+' PM &mdash; '+(stopped?'STOPPED':c)+'</div>';
     }).join('');
-    return '<div class="card-total"><div class="card-total-num">'+(isBlocked(s.dateStr)?'🚫':total)+'</div>'
+    return '<div class="card-total"><div class="card-total-num">'+(isBlocked(s.dateStr)?'X':total)+'</div>'
         +'<div class="card-total-label">'+(isBlocked(s.dateStr)?'BLOCKED':'people booked')+'</div></div>'
         +'<div class="card-slots-mini">'+mini+'</div>'
         +(badges?'<div style="grid-column:1/-1;margin-top:.8rem;">'+badges+'</div>':'');
@@ -537,9 +537,9 @@ function renderSessionDetail(index){
     var total=totalBooked(s);
     document.getElementById('sessionTitle').textContent=s.label;
     document.getElementById('sessionSubtitle').textContent=s.loaded
-        ?total+' PEOPLE BOOKED — '+s.bookings.length+' RESERVATION'+(s.bookings.length!==1?'S':'')
+        ?total+' PEOPLE BOOKED -- '+s.bookings.length+' RESERVATION'+(s.bookings.length!==1?'S':'')
         :'LOADING...';
-    document.getElementById('printDateLine').textContent='Printed '+new Date().toLocaleString('en-NZ')+' — '+s.label;
+    document.getElementById('printDateLine').textContent='Printed '+new Date().toLocaleString('en-NZ')+' -- '+s.label;
     var container=document.getElementById('slotSections');
     if(!s.loaded){container.innerHTML='<div class="empty-slot">Loading bookings...</div>';return;}
     container.innerHTML=SLOTS.map(function(time){
@@ -550,7 +550,7 @@ function renderSessionDetail(index){
                 return '<div class="booking-row">'
                     +'<div class="b-name">'+esc(b.name)+'</div>'
                     +'<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
-                    +'<div><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'—')+'</div><div class="b-guests-label">vegs</div></div>'
+                    +'<div><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-actions">'
                     +'<button class="icon-btn" onclick="openEdit(\''+escA(b.ref)+'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
                     +'<button class="icon-btn del" onclick="delBooking(\''+escA(b.ref)+'\')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
@@ -566,7 +566,7 @@ function renderSessionDetail(index){
     lucide.createIcons();
 }
 
-// ── EDIT ──
+// -- EDIT --
 function openEdit(ref){
     var i=currentIdx();if(i<0)return;
     var b=state.sessions[i].bookings.find(function(b){return b.ref===ref;});
@@ -586,19 +586,19 @@ async function saveEdit(){
     if(i>=0){var b=state.sessions[i].bookings.find(function(b){return b.ref===ref;});if(b)Object.assign(b,payload);renderSessionDetail(i);updateCardBottom(i);}
     closeEditModal();
     try{await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});setTimeout(function(){fetchSession(i);},500);}
-    catch(e){alert('Save may have failed — please refresh.');}
+    catch(e){alert('Save may have failed -- please refresh.');}
 }
 
-// ── DELETE ──
+// -- DELETE --
 async function delBooking(ref){
     if(!confirm('REMOVE THIS BOOKING?'))return;
     var i=currentIdx();
     if(i>=0){state.sessions[i].bookings=state.sessions[i].bookings.filter(function(b){return b.ref!==ref;});renderSessionDetail(i);updateCardBottom(i);}
     try{await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'DELETE'});setTimeout(function(){fetchSession(i);},500);}
-    catch(e){alert('Delete may have failed — please refresh.');}
+    catch(e){alert('Delete may have failed -- please refresh.');}
 }
 
-// ── DEV PANEL ──
+// -- DEV PANEL --
 function toggleDevPanel(){
     var p=document.getElementById('devPanel');
     p.classList.toggle('open');
@@ -644,7 +644,7 @@ async function toggleBlock(dateStr){
 }
 
 
-// ── PAST SESSIONS ──
+// -- PAST SESSIONS --
 var pastState = { tab: 'upcoming', sessions: [], offset: 0, batchSize: 20, loading: false, allLoaded: false };
 
 function switchTab(tab) {
@@ -677,7 +677,7 @@ async function loadPastSessions(append) {
             return;
         }
 
-        // Group by date — sum guests per date
+        // Group by date -- sum guests per date
         var byDate = {};
         rows.forEach(function(r) {
             if (!byDate[r.date]) byDate[r.date] = { date: r.date, guests: 0, bookings: 0 };
@@ -795,7 +795,7 @@ showHome = function() {
 };
 
 
-// ── NEW BOOKING ──
+// -- NEW BOOKING --
 var nb = { date: null, time: null, guests: 1, vegs: 0 };
 
 function openNewBooking(){
@@ -862,7 +862,7 @@ function buildNbGuests(){
     var isCustom = nb.guests > 15;
     wrap.className='nb-custom-wrap'+(isCustom?' active':'');
     wrap.innerHTML='<div class="nb-custom-label">16+</div>'
-        +'<input class="nb-custom-input" id="nbCustomGuests" type="number" min="16" max="200" placeholder="—" value="'+(isCustom?nb.guests:'')+'">';
+        +'<input class="nb-custom-input" id="nbCustomGuests" type="number" min="16" max="200" placeholder="--" value="'+(isCustom?nb.guests:'')+'">';
     grid.appendChild(wrap);
 
     // Wire up the custom input
@@ -965,8 +965,8 @@ document.getElementById('editModal').addEventListener('click',function(e){if(e.t
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEditModal();});
 
 
-// ── LOGIN ──
-// Simple obfuscated check — works on HTTP and HTTPS
+// -- LOGIN --
+// Simple obfuscated check -- works on HTTP and HTTPS
 var SESSION_KEY = 'hell_admin_auth';
 
 function checkLogin() {
@@ -1003,6 +1003,7 @@ setInterval(function(){
 
 // Update "X seconds ago" label every second
 setInterval(updateSyncLabel, 1000);
+
 </script>
 </body>
 </html>
