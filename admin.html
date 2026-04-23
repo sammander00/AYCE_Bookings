@@ -246,11 +246,11 @@
         .nb-time-btn.active .nb-time-count{opacity:.7;color:#151515;}
         .nb-time-btn.full{opacity:.5;cursor:not-allowed;}
         .nb-guests-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;}
-        .nb-guest-btn{height:44px;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+        .nb-guest-btn{height:56px;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;width:100%;}
         .nb-guest-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
         .nb-guest-btn.zero{opacity:.4;}
-        .nb-custom-btn{height:44px;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;opacity:.6;}
-        .nb-custom-btn:hover{border-color:rgba(225,216,183,.3);opacity:1;}
+        .nb-custom-btn{grid-column:1/-1;height:40px;background:transparent;border:1px solid rgba(225,216,183,.12);color:var(--bone);font-size:.7rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;opacity:.5;width:100%;}
+        .nb-custom-btn:hover{border-color:rgba(225,216,183,.25);opacity:.8;}
         .nb-custom-btn.active{background:var(--red);border-color:var(--red);color:#151515;opacity:1;}
         .nb-custom-select{display:none;margin-top:.6rem;width:100%;background:#111;border:1px solid rgba(225,216,183,.2);color:var(--bone);padding:.75rem 1rem;font-size:1rem;font-family:var(--fb);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23E1D8B7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
         .nb-custom-select:focus{outline:none;border-color:var(--red);}
@@ -333,7 +333,7 @@
 
 <!-- NEW BOOKING MODAL -->
 <div class="modal-backdrop" id="newBookingModal">
-    <div class="modal-box" style="max-width:480px;padding:2rem;max-height:90vh;overflow-y:auto;">
+    <div class="modal-box" style="max-width:900px;width:90vw;padding:2.5rem;">
         <h2 class="modal-title">NEW BOOKING</h2>
 
         <!-- Date selector -->
@@ -365,16 +365,14 @@
             </div>
         </div>
 
-        <!-- Guests -->
-        <div class="modal-field">
-            <label>Guests <span style="color:var(--red)">*</span></label>
-            <div class="nb-guests-grid" id="nbGuestsGrid"></div>
-        </div>
-
-        <!-- Vegs -->
-        <div class="modal-field">
-            <label>Vegetarians <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(optional)</span></label>
-            <div style="max-height:140px;overflow-y:auto;padding-right:2px;">
+        <!-- Guests + Vegs side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;">
+            <div class="modal-field">
+                <label>Guests <span style="color:var(--red)">*</span></label>
+                <div class="nb-guests-grid" id="nbGuestsGrid"></div>
+            </div>
+            <div class="modal-field">
+                <label>Vegetarians</label>
                 <div class="nb-guests-grid" id="nbVegsGrid"></div>
             </div>
         </div>
