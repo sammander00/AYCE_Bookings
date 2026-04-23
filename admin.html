@@ -151,6 +151,86 @@
         .print-col-header{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#666;}
         .print-date-line{display:none;font-size:.75rem;color:#999;margin-bottom:1.5rem;font-style:italic;}
         @media(max-width:800px){.tuesday-grid{grid-template-columns:1fr;}.wrap{margin:1rem;padding:1.5rem;}.block-dates,.dev-date-grid{grid-template-columns:repeat(2,1fr);}}
+
+        /* ── LOGIN SCREEN ── */
+        #loginScreen {
+            position: fixed; inset: 0;
+            background: #151515;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        #loginScreen.hidden { display: none; }
+        .login-box {
+            background: rgba(20,20,20,0.97);
+            border: 1px solid rgba(225,216,183,0.12);
+            padding: 3rem;
+            width: 100%; max-width: 380px;
+            text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .login-box::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 80%; height: 60%; background: #C80613;
+            filter: blur(100px); opacity: 0.08;
+            transform: translate(-50%,-50%); pointer-events: none;
+        }
+        .login-box > * { position: relative; z-index: 1; }
+        .login-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.8rem; letter-spacing: 0.08em;
+            color: #E1D8B7; line-height: 1; margin-bottom: 0.3rem;
+        }
+        .login-sub {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.25em;
+            text-transform: uppercase; color: #C80613; margin-bottom: 2.5rem;
+        }
+        .login-input {
+            width: 100%; background: rgba(225,216,183,0.04);
+            border: 1px solid rgba(225,216,183,0.15); border-radius: 2px;
+            color: #E1D8B7; padding: 1rem 1.2rem; font-size: 1.8rem;
+            font-family: 'Roboto', sans-serif; text-align: center;
+            letter-spacing: 0.5em; margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .login-input:focus { outline: none; border-color: #C80613; background: rgba(225,216,183,0.07); }
+        .login-input.error { border-color: #e05050; animation: shake 0.3s ease; }
+        .login-btn {
+            width: 100%; padding: 1rem;
+            background: #C80613; border: none; color: #151515;
+            font-family: 'Bebas Neue', cursive; font-size: 1.6rem;
+            letter-spacing: 0.1em; cursor: pointer; transition: opacity 0.2s;
+        }
+        .login-btn:hover { opacity: 0.85; }
+        .login-error {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+            text-transform: uppercase; color: #e05050;
+            margin-top: 1rem; display: none;
+        }
+        @keyframes shake {
+            0%,100%{transform:translateX(0)}
+            25%{transform:translateX(-6px)}
+            75%{transform:translateX(6px)}
+        }
+
+        /* ── PAST SESSIONS ── */
+        .view-tabs { display:flex; gap:0; margin-bottom:2.5rem; border-bottom:1px solid rgba(225,216,183,0.1); }
+        .view-tab { background:none; border:none; border-bottom:2px solid transparent; color:var(--bone); font-family:var(--fh); font-size:1.1rem; letter-spacing:0.15em; padding:0.6rem 1.5rem 0.8rem; cursor:pointer; opacity:0.35; transition:all 0.2s; margin-bottom:-1px; }
+        .view-tab.active { opacity:1; border-bottom-color:var(--red); color:var(--bone); }
+        .view-tab:hover:not(.active) { opacity:0.6; }
+
+        .past-month-group { margin-bottom:2.5rem; }
+        .past-month-label { font-size:0.7rem; font-weight:900; letter-spacing:0.25em; text-transform:uppercase; color:var(--red); margin-bottom:1rem; opacity:0.8; }
+        .past-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.8rem; }
+        .past-card { border:1px solid rgba(225,216,183,0.08); background:rgba(225,216,183,0.015); padding:1.4rem 1.8rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:space-between; }
+        .past-card:hover { border-color:rgba(225,216,183,0.2); background:rgba(225,216,183,0.03); }
+        .past-card-date { font-family:var(--fh); font-size:1.4rem; letter-spacing:0.06em; }
+        .past-card-count { font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; opacity:0.35; }
+        .past-card-arrow { color:var(--red); opacity:0; transition:all 0.2s; }
+        .past-card:hover .past-card-arrow { opacity:1; transform:translateX(3px); }
+        .past-load-more { width:100%; background:none; border:1px solid rgba(225,216,183,0.12); color:var(--bone); font-family:var(--fh); font-size:1rem; letter-spacing:0.12em; padding:0.9rem; cursor:pointer; transition:all 0.2s; margin-top:1rem; }
+        .past-load-more:hover { border-color:rgba(225,216,183,0.25); }
+        .past-empty { font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; opacity:0.25; padding:2rem 0; }
+
         /* refresh button removed */
         .btn-new-booking{background:var(--red);border:1px solid var(--red);color:#151515;padding:.5rem 1.2rem;font-family:var(--fh);font-size:.95rem;letter-spacing:.12em;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;gap:.5rem;}
         .btn-new-booking:hover{opacity:.85;}
@@ -176,6 +256,21 @@
 </head>
 <body>
 <div class="texture"></div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+    <div class="login-box">
+        <div class="login-title">STAFF PORTAL</div>
+        <div class="login-sub">Hell Pizza Bond St</div>
+        <input class="login-input" type="password" id="loginInput"
+               placeholder="····" maxlength="10"
+               onkeydown="if(event.key==='Enter') checkLogin()">
+        <button class="login-btn" onclick="checkLogin()">ENTER</button>
+        <div class="login-error" id="loginError">Incorrect password</div>
+    </div>
+</div>
+
+
 <main class="wrap">
     <header class="topbar">
         <div class="topbar-brand">HELL <span>PIZZA</span> &mdash; STAFF</div>
@@ -202,17 +297,29 @@
 
     <!-- HOME -->
     <div id="homeView">
-        <div class="home-heading"><h1>UPCOMING SESSIONS</h1><p>All You Can Eat Tuesday &mdash; Bond St</p></div>
-        <div class="tuesday-grid" id="tuesdayGrid"></div>
+        <div class="home-heading">
+            <h1>SESSIONS</h1>
+            <p>All You Can Eat Tuesday &mdash; Bond St</p>
+        </div>
+        <div class="view-tabs">
+            <button class="view-tab active" id="tabUpcoming" onclick="switchTab('upcoming')">UPCOMING</button>
+            <button class="view-tab" id="tabPast" onclick="switchTab('past')">PAST SESSIONS</button>
+        </div>
+        <div id="upcomingView">
+            <div class="tuesday-grid" id="tuesdayGrid"></div>
+        </div>
+        <div id="pastView" style="display:none;">
+            <div id="pastSessionsList"></div>
+        </div>
     </div>
 
     <!-- SESSION -->
     <div id="sessionView">
-        <button class="session-back" onclick="showHome()"><i data-lucide="arrow-left" size="15"></i>ALL SESSIONS</button>
+        <button class="session-back" onclick="showHome()"><i data-lucide="arrow-left" size="15"></i><span id="backLabel">ALL SESSIONS</span></button>
         <div class="session-header">
             <div class="session-title"><h2 id="sessionTitle">TUESDAY</h2><p id="sessionSubtitle">LOADING...</p></div>
             <div class="session-actions">
-                <button class="btn-outline" onclick="refreshSession()"><i data-lucide="refresh-cw" size="14" id="refreshIcon"></i>REFRESH</button>
+                <span id="lastSynced" style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.35;align-self:center;"></span>
                 <button class="btn-outline" onclick="window.print()"><i data-lucide="printer" size="14"></i>PRINT</button>
             </div>
         </div>
@@ -536,6 +643,158 @@ async function toggleBlock(dateStr){
     state.sessions.forEach(function(_,i){updateCardBottom(i);});
 }
 
+
+// ── PAST SESSIONS ──
+var pastState = { tab: 'upcoming', sessions: [], offset: 0, batchSize: 20, loading: false, allLoaded: false };
+
+function switchTab(tab) {
+    pastState.tab = tab;
+    document.getElementById('tabUpcoming').classList.toggle('active', tab === 'upcoming');
+    document.getElementById('tabPast').classList.toggle('active', tab === 'past');
+    document.getElementById('upcomingView').style.display = tab === 'upcoming' ? '' : 'none';
+    document.getElementById('pastView').style.display = tab === 'past' ? '' : 'none';
+    if (tab === 'past' && pastState.sessions.length === 0) loadPastSessions();
+}
+
+async function loadPastSessions(append) {
+    if (pastState.loading || pastState.allLoaded) return;
+    pastState.loading = true;
+
+    var today = localDateStr(new Date());
+
+    try {
+        var rows = await sb(
+            'bookings?date=lt.' + encodeURIComponent(today)
+            + '&order=date.desc'
+            + '&select=date,guests'
+            + '&limit=' + (pastState.batchSize * 7)  // fetch enough to cover batches
+            + '&offset=' + pastState.offset
+        );
+
+        if (!rows || rows.length === 0) {
+            pastState.allLoaded = true;
+            renderPastSessions();
+            return;
+        }
+
+        // Group by date — sum guests per date
+        var byDate = {};
+        rows.forEach(function(r) {
+            if (!byDate[r.date]) byDate[r.date] = { date: r.date, guests: 0, bookings: 0 };
+            byDate[r.date].guests += parseInt(r.guests) || 0;
+            byDate[r.date].bookings++;
+        });
+
+        // Get unique dates sorted desc
+        var dates = Object.keys(byDate).sort(function(a,b){ return b.localeCompare(a); });
+
+        if (append) {
+            pastState.sessions = pastState.sessions.concat(dates.map(function(d){ return byDate[d]; }));
+        } else {
+            pastState.sessions = dates.map(function(d){ return byDate[d]; });
+        }
+
+        pastState.offset += rows.length;
+        if (rows.length < pastState.batchSize * 7) pastState.allLoaded = true;
+
+    } catch(e) { console.error('Failed to load past sessions', e); }
+
+    pastState.loading = false;
+    renderPastSessions();
+}
+
+function renderPastSessions() {
+    var el = document.getElementById('pastSessionsList');
+    if (!el) return;
+
+    if (pastState.sessions.length === 0) {
+        el.innerHTML = '<p class="past-empty">No past sessions yet</p>';
+        return;
+    }
+
+    // Group by month
+    var byMonth = {};
+    var monthOrder = [];
+    pastState.sessions.forEach(function(s) {
+        var parts = s.date.split('-');
+        var key = parts[0] + '-' + parts[1];
+        if (!byMonth[key]) { byMonth[key] = []; monthOrder.push(key); }
+        byMonth[key].push(s);
+    });
+
+    var fullMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    var html = monthOrder.map(function(key) {
+        var parts = key.split('-');
+        var label = fullMonths[parseInt(parts[1])-1] + ' ' + parts[0];
+        var cards = byMonth[key].map(function(s) {
+            var d = new Date(s.date + 'T12:00:00');
+            var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            var mos  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return '<div class="past-card" onclick="openPastSession('' + s.date + '')">'
+                + '<div>'
+                + '<div class="past-card-date">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + mos[d.getMonth()] + '</div>'
+                + '<div class="past-card-count">' + s.guests + ' PEOPLE &bull; ' + s.bookings + ' BOOKING' + (s.bookings !== 1 ? 'S' : '') + '</div>'
+                + '</div>'
+                + '<i data-lucide="arrow-right" size="16" class="past-card-arrow"></i>'
+                + '</div>';
+        }).join('');
+
+        return '<div class="past-month-group">'
+            + '<div class="past-month-label">' + label + '</div>'
+            + '<div class="past-grid">' + cards + '</div>'
+            + '</div>';
+    }).join('');
+
+    if (!pastState.allLoaded) {
+        html += '<button class="past-load-more" onclick="loadPastSessions(true)">LOAD MORE</button>';
+    }
+
+    el.innerHTML = html;
+    lucide.createIcons();
+}
+
+function openPastSession(dateStr) {
+    // Find or create a session entry for this past date
+    var existing = state.sessions.findIndex(function(s){ return s.dateStr === dateStr; });
+    if (existing >= 0) {
+        openSession(existing);
+        return;
+    }
+
+    // Create a temporary session entry
+    var d = new Date(dateStr + 'T12:00:00');
+    var mos = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var tempSession = {
+        dateStr: dateStr,
+        day: d.getDate(),
+        month: mos[d.getMonth()],
+        year: d.getFullYear(),
+        label: 'TUESDAY ' + d.getDate() + ' ' + mos[d.getMonth()] + ' ' + d.getFullYear(),
+        bookings: [],
+        loaded: false
+    };
+
+    state.sessions.push(tempSession);
+    var idx = state.sessions.length - 1;
+
+    state.currentDate = dateStr;
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('sessionView').style.display = 'block';
+    document.getElementById('backLabel').textContent = 'PAST SESSIONS';
+    renderSessionDetail(idx);
+    fetchSession(idx);
+}
+
+// Override showHome to return to the right tab
+var _origShowHome = showHome;
+showHome = function() {
+    _origShowHome();
+    document.getElementById('backLabel').textContent = 'ALL SESSIONS';
+    if (pastState.tab === 'past') switchTab('past');
+};
+
+
 // ── NEW BOOKING ──
 var nb = { date: null, time: null, guests: 1, vegs: 0 };
 
@@ -705,7 +964,43 @@ function escA(s){return String(s||'').replace(/'/g,"\\'");}
 document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEditModal();});
 
-init();
+
+// ── LOGIN ──
+var PASS_HASH = '7f4fdeb9266dd07985291dd0b31361ed2f75bdc371b2cf9f952a87fc69da25bb';
+var SESSION_KEY = 'hell_admin_auth';
+
+async function hashStr(str) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
+
+async function checkLogin() {
+    var val = document.getElementById('loginInput').value;
+    var hash = await hashStr(val);
+    if (hash === PASS_HASH) {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        document.getElementById('loginScreen').classList.add('hidden');
+        init();
+    } else {
+        var inp = document.getElementById('loginInput');
+        inp.classList.add('error');
+        document.getElementById('loginError').style.display = 'block';
+        inp.value = '';
+        setTimeout(function(){ inp.classList.remove('error'); }, 400);
+    }
+}
+
+// Check if already authenticated this session
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.getElementById('loginScreen').classList.add('hidden');
+    // init() called below
+} else {
+    // Focus password field
+    setTimeout(function(){ document.getElementById('loginInput').focus(); }, 100);
+}
+
+
+if (sessionStorage.getItem(SESSION_KEY) === '1') init();
 
 // Auto-refresh every 10 seconds
 setInterval(function(){
