@@ -249,11 +249,12 @@
         .nb-guest-btn{height:44px;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
         .nb-guest-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
         .nb-guest-btn.zero{opacity:.4;}
-        .nb-custom-wrap{height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(225,216,183,.15);padding:.2rem .4rem;cursor:pointer;transition:all .2s;min-width:0;}
-        .nb-custom-wrap.active{border-color:var(--red);background:rgba(200,6,19,.08);}
-        .nb-custom-label{font-size:.5rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;opacity:.4;margin-bottom:.2rem;white-space:nowrap;}
-        .nb-custom-input{width:100%;background:transparent;border:none;color:var(--bone);font-size:1rem;font-weight:700;text-align:center;outline:none;padding:0;}
-        .nb-custom-input::placeholder{opacity:.3;}
+        .nb-custom-btn{height:44px;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;opacity:.6;}
+        .nb-custom-btn:hover{border-color:rgba(225,216,183,.3);opacity:1;}
+        .nb-custom-btn.active{background:var(--red);border-color:var(--red);color:#151515;opacity:1;}
+        .nb-custom-select{display:none;margin-top:.6rem;width:100%;background:#111;border:1px solid rgba(225,216,183,.2);color:var(--bone);padding:.75rem 1rem;font-size:1rem;font-family:var(--fb);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23E1D8B7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
+        .nb-custom-select:focus{outline:none;border-color:var(--red);}
+        .nb-custom-select option{background:#111;color:var(--bone);}
     </style>
 </head>
 <body>
@@ -332,7 +333,7 @@
 
 <!-- NEW BOOKING MODAL -->
 <div class="modal-backdrop" id="newBookingModal">
-    <div class="modal-box" style="max-width:480px;padding:2rem;">
+    <div class="modal-box" style="max-width:480px;padding:2rem;max-height:90vh;overflow-y:auto;">
         <h2 class="modal-title">NEW BOOKING</h2>
 
         <!-- Date selector -->
@@ -349,13 +350,13 @@
 
         <!-- Name -->
         <div class="modal-field">
-            <label>Name</label>
-            <input type="text" id="nbName" placeholder="Full name" autocomplete="off">
+            <label>Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="nbName" placeholder="Full name" autocomplete="off" required>
         </div>
-        <!-- Phone + Email side by side -- at least one required -->
+        <!-- Phone + Email side by side -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
             <div class="modal-field">
-                <label>Phone or Email <span style="color:var(--red)">*</span> <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(or email)</span></label>
+                <label>Phone</label>
                 <input type="tel" id="nbPhone" placeholder="021 000 000" autocomplete="off">
             </div>
             <div class="modal-field">
@@ -373,7 +374,9 @@
         <!-- Vegs -->
         <div class="modal-field">
             <label>Vegetarians <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(optional)</span></label>
-            <div class="nb-guests-grid" id="nbVegsGrid"></div>
+            <div style="max-height:140px;overflow-y:auto;padding-right:2px;">
+                <div class="nb-guests-grid" id="nbVegsGrid"></div>
+            </div>
         </div>
 
         <div class="modal-btns">
@@ -877,36 +880,51 @@ function buildNbGuests(){
         btn.onclick=(function(val){ return function(){
             nb.guests=val;
             if(nb.vegs>val) nb.vegs=0;
+            var sel=document.getElementById('nbCustomSelect');
+            if(sel) sel.style.display='none';
             buildNbGuests();
             buildNbVegs();
         };})(i);
         grid.appendChild(btn);
     }
-    // Custom number input card for 16+
-    var wrap=document.createElement('div');
+    // Custom button for 16+
     var isCustom = nb.guests > 15;
-    wrap.className='nb-custom-wrap'+(isCustom?' active':'');
-    wrap.innerHTML='<div class="nb-custom-label">16+</div>'
-        +'<input class="nb-custom-input" id="nbCustomGuests" type="number" min="16" max="200" placeholder="--" value="'+(isCustom?nb.guests:'')+'">';
-    grid.appendChild(wrap);
+    var customBtn = document.createElement('button');
+    customBtn.type = 'button';
+    customBtn.textContent = 'CUSTOM';
+    customBtn.className = 'nb-custom-btn' + (isCustom ? ' active' : '');
+    customBtn.onclick = function() {
+        var sel = document.getElementById('nbCustomSelect');
+        sel.style.display = sel.style.display === 'block' ? 'none' : 'block';
+        if (sel.style.display === 'block') sel.focus();
+    };
+    grid.appendChild(customBtn);
 
-    // Wire up the custom input
-    var inp = wrap.querySelector('#nbCustomGuests');
-    inp.addEventListener('focus', function(){
-        // Deselect the number buttons
-        nb.guests = 16;
-        buildNbGuests();
-        document.getElementById('nbCustomGuests').focus();
-    });
-    inp.addEventListener('input', function(){
-        var val = parseInt(this.value);
-        if(val >= 16) {
-            nb.guests = val;
-            if(nb.vegs > val) nb.vegs = 0;
-            wrap.classList.add('active');
-            buildNbVegs();
-        }
-    });
+    // Insert dropdown below grid
+    var existing = document.getElementById('nbCustomSelect');
+    if (existing) existing.remove();
+    var sel = document.createElement('select');
+    sel.id = 'nbCustomSelect';
+    sel.className = 'nb-custom-select';
+    sel.style.display = isCustom ? 'block' : 'none';
+    var placeholder = document.createElement('option');
+    placeholder.value = ''; placeholder.textContent = 'Select number of guests...'; placeholder.disabled = true;
+    if (!isCustom) placeholder.selected = true;
+    sel.appendChild(placeholder);
+    for (var j = 16; j <= 30; j++) {
+        var opt = document.createElement('option');
+        opt.value = j; opt.textContent = j + ' guests';
+        if (j === nb.guests) opt.selected = true;
+        sel.appendChild(opt);
+    }
+    sel.onchange = function() {
+        nb.guests = parseInt(this.value);
+        if (nb.vegs > nb.guests) nb.vegs = 0;
+        document.getElementById('nbCustomBtn') && document.getElementById('nbCustomBtn').classList.add('active');
+        document.querySelectorAll('.nb-guest-btn').forEach(function(b) { b.classList.remove('active'); });
+        buildNbVegs();
+    };
+    grid.parentNode.insertBefore(sel, grid.nextSibling);
 }
 
 function buildNbVegs(){
