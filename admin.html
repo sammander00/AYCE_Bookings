@@ -731,7 +731,7 @@ function renderPastSessions() {
             var d = new Date(s.date + 'T12:00:00');
             var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
             var mos  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            return '<div class="past-card" onclick="openPastSession('' + s.date + '')">'
+            return '<div class="past-card" onclick="openPastSession(\''+s.date+'\')">' 
                 + '<div>'
                 + '<div class="past-card-date">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + mos[d.getMonth()] + '</div>'
                 + '<div class="past-card-count">' + s.guests + ' PEOPLE &bull; ' + s.bookings + ' BOOKING' + (s.bookings !== 1 ? 'S' : '') + '</div>'
