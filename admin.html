@@ -443,6 +443,7 @@
 </div>
 
 <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 
 var SB_URL = 'https://zmhfympqxvdkotyjzvuk.supabase.co';
@@ -1234,12 +1235,65 @@ if (sessionStorage.getItem(SESSION_KEY) === '1') {
     setTimeout(function(){ document.getElementById('loginInput').focus(); }, 100);
 }
 
-// Auto-refresh every 10 seconds
+// -- REALTIME SUBSCRIPTION --
+// Supabase pushes changes instantly — no polling needed
+var supabaseClient = null;
+
+function initRealtime() {
+    try {
+        supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
+        supabaseClient
+            .channel('bookings-changes')
+            .on('postgres_changes',
+                { event: '*', schema: 'public', table: 'bookings' },
+                function(payload) {
+                    // Work out which session was affected
+                    var changedDate = (payload.new && payload.new.date) || (payload.old && payload.old.date);
+                    if (!changedDate) return;
+
+                    var idx = state.sessions.findIndex(function(s){ return s.dateStr === changedDate; });
+                    if (idx >= 0) {
+                        fetchSession(idx);
+                    }
+                    // Update sync label
+                    state.lastSyncedAt = Date.now();
+                    updateSyncLabel();
+                }
+            )
+            .subscribe(function(status) {
+                if (status === 'SUBSCRIBED') {
+                    console.log('Realtime connected');
+                } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    console.warn('Realtime error, falling back to polling');
+                    startPollingFallback();
+                }
+            });
+    } catch(e) {
+        console.warn('Realtime init failed:', e);
+        startPollingFallback();
+    }
+}
+
+var pollingInterval = null;
+function startPollingFallback() {
+    if (pollingInterval) return; // already running
+    pollingInterval = setInterval(function(){
+        var i=currentIdx();
+        if(i>=0) fetchSession(i);
+        else state.sessions.forEach(function(_,idx){ fetchSession(idx); });
+    }, 10000);
+}
+
+// Start realtime — falls back to 10s polling automatically if it fails
+initRealtime();
+
+// Keep polling as a safety net regardless (catches edge cases realtime misses)
 setInterval(function(){
     var i=currentIdx();
     if(i>=0) fetchSession(i);
     else state.sessions.forEach(function(_,idx){ fetchSession(idx); });
-}, 10000);
+}, 30000);
 
 // Update "X seconds ago" label every second
 setInterval(updateSyncLabel, 1000);
