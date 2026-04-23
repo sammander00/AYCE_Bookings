@@ -682,6 +682,24 @@ async function saveEdit(){
         await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});
         await logAction(ref,'EDIT','staff',payload.name,{before:before,after:{date:payload.date,time:payload.time,guests:payload.guests}});
         logsState.loaded=false;
+        // Refresh the original session
+        setTimeout(function(){
+            fetchSession(i);
+            // If date changed, also refresh the destination session
+            if(before.date && before.date !== payload.date) {
+                var destIdx = state.sessions.findIndex(function(s){ return s.dateStr === payload.date; });
+                if(destIdx >= 0 && destIdx !== i) fetchSession(destIdx);
+            }
+        }, 500);
+    }
+    catch(e){alert('Save may have failed -- please refresh.');}
+}
+
+    closeEditModal();
+    try{
+        await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});
+        await logAction(ref,'EDIT','staff',payload.name,{before:before,after:{date:payload.date,time:payload.time,guests:payload.guests}});
+        logsState.loaded=false;
         setTimeout(function(){fetchSession(i);},500);
     }
     catch(e){alert('Save may have failed -- please refresh.');}
