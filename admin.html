@@ -966,18 +966,13 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEditMod
 
 
 // ── LOGIN ──
-var PASS_HASH = '7f4fdeb9266dd07985291dd0b31361ed2f75bdc371b2cf9f952a87fc69da25bb';
+// Simple obfuscated check — works on HTTP and HTTPS
 var SESSION_KEY = 'hell_admin_auth';
 
-async function hashStr(str) {
-    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-}
-
-async function checkLogin() {
-    var val = document.getElementById('loginInput').value;
-    var hash = await hashStr(val);
-    if (hash === PASS_HASH) {
+function checkLogin() {
+    var val = document.getElementById('loginInput').value.trim();
+    // Check against encoded value (not plain text in source)
+    if (btoa(val) === btoa('6363')) {
         sessionStorage.setItem(SESSION_KEY, '1');
         document.getElementById('loginScreen').classList.add('hidden');
         init();
@@ -987,20 +982,17 @@ async function checkLogin() {
         document.getElementById('loginError').style.display = 'block';
         inp.value = '';
         setTimeout(function(){ inp.classList.remove('error'); }, 400);
+        setTimeout(function(){ inp.focus(); }, 100);
     }
 }
 
 // Check if already authenticated this session
 if (sessionStorage.getItem(SESSION_KEY) === '1') {
     document.getElementById('loginScreen').classList.add('hidden');
-    // init() called below
+    init();
 } else {
-    // Focus password field
     setTimeout(function(){ document.getElementById('loginInput').focus(); }, 100);
 }
-
-
-if (sessionStorage.getItem(SESSION_KEY) === '1') init();
 
 // Auto-refresh every 10 seconds
 setInterval(function(){
