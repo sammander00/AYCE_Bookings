@@ -400,6 +400,16 @@
             loadBooking();
         }
 
+
+        async function logAction(ref, action, actor, name, details) {
+            try {
+                await sbFetch('booking_logs', {
+                    method: 'POST',
+                    body: JSON.stringify({ ref, action, actor, name, details })
+                });
+            } catch(e) { console.warn('Log failed:', e); }
+        }
+
         async function loadBooking() {
             showState('loadingState');
             try {
@@ -486,8 +496,8 @@
                     method: 'PATCH',
                     body: JSON.stringify({ date: manageState.selectedDate, time: manageState.selectedTime })
                 });
-                // Send change notification email via Apps Script
                 fetch(APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'CHANGE', ref: manageState.ref, date: manageState.selectedDate, time: manageState.selectedTime }) });
+                await logAction(manageState.ref, 'CHANGE', 'customer', manageState.booking.name, { newDate: manageState.selectedDate, newTime: manageState.selectedTime, oldDate: manageState.booking.date, oldTime: manageState.booking.time });
                 showState('successState');
             } catch (err) {
                 alert('Something went wrong. Please try again.');
@@ -500,6 +510,7 @@
             if (!confirm('Are you sure you want to cancel your booking?')) return;
             try {
                 await sbFetch('bookings?ref=eq.' + encodeURIComponent(manageState.ref), { method: 'DELETE' });
+                await logAction(manageState.ref, 'CANCEL', 'customer', manageState.booking.name, { date: manageState.booking.date, time: manageState.booking.time, guests: manageState.booking.guests });
                 showState('cancelledState');
                 lucide.createIcons();
             } catch (err) {

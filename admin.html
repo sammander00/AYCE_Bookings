@@ -230,6 +230,24 @@
         .past-load-more:hover { border-color:rgba(225,216,183,0.25); }
         .past-empty { font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; opacity:0.25; padding:2rem 0; }
 
+
+        /* -- LOGS -- */
+        .log-row { display:grid; grid-template-columns:140px 80px 1fr auto; align-items:center; gap:1rem; padding:.9rem 1rem; border-bottom:1px solid rgba(225,216,183,.05); font-size:.85rem; }
+        .log-row:hover { background:rgba(225,216,183,.02); }
+        .log-time { font-size:.7rem; opacity:.35; font-weight:700; letter-spacing:.05em; }
+        .log-action { font-family:var(--fd); font-size:1rem; }
+        .log-action.EDIT { color:#4a9eff; }
+        .log-action.DELETE { color:#e05050; }
+        .log-action.CANCEL { color:#e05050; }
+        .log-action.CHANGE { color:#ff8c00; }
+        .log-actor { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; opacity:.35; text-align:right; }
+        .log-actor.staff { color:var(--red); opacity:.7; }
+        .log-name { font-weight:700; letter-spacing:.04em; }
+        .log-detail { font-size:.75rem; opacity:.4; margin-top:.15rem; }
+        .log-ref { font-size:.7rem; opacity:.25; font-family:monospace; }
+        .logs-header { display:grid; grid-template-columns:140px 80px 1fr auto; gap:1rem; padding:.5rem 1rem; border-bottom:2px solid rgba(225,216,183,.1); margin-bottom:.2rem; }
+        .logs-col-header { font-size:.6rem; font-weight:900; letter-spacing:.2em; text-transform:uppercase; opacity:.35; }
+
         /* refresh button removed */
         .btn-new-booking{background:var(--red);border:1px solid var(--red);color:#151515;padding:.5rem 1.2rem;font-family:var(--fh);font-size:.95rem;letter-spacing:.12em;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;gap:.5rem;}
         .btn-new-booking:hover{opacity:.85;}
@@ -307,12 +325,16 @@
         <div class="view-tabs">
             <button class="view-tab active" id="tabUpcoming" onclick="switchTab('upcoming')">UPCOMING</button>
             <button class="view-tab" id="tabPast" onclick="switchTab('past')">PAST SESSIONS</button>
+            <button class="view-tab" id="tabLogs" onclick="switchTab('logs')">LOGS</button>
         </div>
         <div id="upcomingView">
             <div class="tuesday-grid" id="tuesdayGrid"></div>
         </div>
         <div id="pastView" style="display:none;">
             <div id="pastSessionsList"></div>
+        </div>
+        <div id="logsView" style="display:none;">
+            <div id="logsList"></div>
         </div>
     </div>
 
@@ -435,6 +457,16 @@ function getUpcomingTuesdays(){
 async function sb(path,opts){
     var res=await fetch(SB_URL+'/rest/v1/'+path,Object.assign({headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}},opts||{}));
     var t=await res.text(); return t?JSON.parse(t):null;
+}
+
+
+async function logAction(ref, action, actor, name, details) {
+    try {
+        await sb('booking_logs', {
+            method: 'POST',
+            body: JSON.stringify({ ref, action, actor, name, details })
+        });
+    } catch(e) { console.warn('Log failed:', e); }
 }
 
 function totalBooked(s){ return (s.bookings||[]).reduce(function(a,b){return a+(parseInt(b.guests)||0);},0); }
@@ -652,9 +684,12 @@ function switchTab(tab) {
     pastState.tab = tab;
     document.getElementById('tabUpcoming').classList.toggle('active', tab === 'upcoming');
     document.getElementById('tabPast').classList.toggle('active', tab === 'past');
+    document.getElementById('tabLogs').classList.toggle('active', tab === 'logs');
     document.getElementById('upcomingView').style.display = tab === 'upcoming' ? '' : 'none';
     document.getElementById('pastView').style.display = tab === 'past' ? '' : 'none';
+    document.getElementById('logsView').style.display = tab === 'logs' ? '' : 'none';
     if (tab === 'past' && pastState.sessions.length === 0) loadPastSessions();
+    if (tab === 'logs') loadLogs();
 }
 
 async function loadPastSessions(append) {
@@ -1026,6 +1061,59 @@ function escA(s){return String(s||'').replace(/'/g,"\\'");}
 document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEditModal();});
 
+
+
+// -- LOGS --
+var logsState = { entries: [], loaded: false };
+
+async function loadLogs() {
+    if (logsState.loaded) { renderLogs(); return; }
+    var el = document.getElementById('logsList');
+    if (el) el.innerHTML = '<div class="empty-slot">Loading logs...</div>';
+    try {
+        var rows = await sb('booking_logs?order=timestamp.desc&limit=200');
+        logsState.entries = rows || [];
+        logsState.loaded = true;
+    } catch(e) { console.error('Failed to load logs', e); }
+    renderLogs();
+}
+
+function renderLogs() {
+    var el = document.getElementById('logsList');
+    if (!el) return;
+    if (!logsState.entries.length) {
+        el.innerHTML = '<p class="past-empty">No activity logged yet</p>';
+        return;
+    }
+    var html = '<div class="logs-header">'
+        + '<div class="logs-col-header">Time</div>'
+        + '<div class="logs-col-header">Action</div>'
+        + '<div class="logs-col-header">Details</div>'
+        + '<div class="logs-col-header">By</div>'
+        + '</div>';
+
+    html += logsState.entries.map(function(log) {
+        var d = new Date(log.timestamp);
+        var timeStr = d.toLocaleDateString('en-NZ', {day:'numeric',month:'short',year:'numeric'})
+            + ' ' + d.toLocaleTimeString('en-NZ', {hour:'2-digit',minute:'2-digit'});
+        var det = log.details || {};
+        var detailStr = '';
+        if (log.action === 'EDIT') detailStr = (det.guests ? det.guests + ' guests' : '') + (det.time ? ' &bull; ' + det.time + ' PM' : '');
+        if (log.action === 'CHANGE') detailStr = (det.oldDate ? det.oldDate + ' ' + det.oldTime + 'pm &rarr; ' : '') + (det.newDate ? det.newDate + ' ' + det.newTime + 'pm' : '');
+        if (log.action === 'CANCEL' || log.action === 'DELETE') detailStr = (det.date || '') + (det.time ? ' &bull; ' + det.time + 'pm' : '') + (det.guests ? ' &bull; ' + det.guests + ' guests' : '');
+
+        return '<div class="log-row">'
+            + '<div class="log-time">' + timeStr + '</div>'
+            + '<div class="log-action ' + log.action + '">' + log.action + '</div>'
+            + '<div><div class="log-name">' + esc(log.name || '') + ' <span class="log-ref">' + esc(log.ref) + '</span></div>'
+            + (detailStr ? '<div class="log-detail">' + detailStr + '</div>' : '')
+            + '</div>'
+            + '<div class="log-actor ' + (log.actor||'') + '">' + (log.actor||'') + '</div>'
+            + '</div>';
+    }).join('');
+
+    el.innerHTML = html;
+}
 
 // -- LOGIN --
 // Simple obfuscated check -- works on HTTP and HTTPS
