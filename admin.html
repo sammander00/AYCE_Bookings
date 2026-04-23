@@ -151,8 +151,22 @@
         .print-col-header{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#666;}
         .print-date-line{display:none;font-size:.75rem;color:#999;margin-bottom:1.5rem;font-style:italic;}
         @media(max-width:800px){.tuesday-grid{grid-template-columns:1fr;}.wrap{margin:1rem;padding:1.5rem;}.block-dates,.dev-date-grid{grid-template-columns:repeat(2,1fr);}}
-        .spin{animation:sp .7s linear infinite;}
-        @keyframes sp{to{transform:rotate(360deg);}}
+        /* refresh button removed */
+        .btn-new-booking{background:var(--red);border:1px solid var(--red);color:#151515;padding:.5rem 1.2rem;font-family:var(--fh);font-size:.95rem;letter-spacing:.12em;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;gap:.5rem;}
+        .btn-new-booking:hover{opacity:.85;}
+        .nb-date-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:.2rem;}
+        .nb-date-btn{padding:.9rem .5rem;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);cursor:pointer;text-align:center;transition:all .2s;font-family:var(--fb);}
+        .nb-date-btn .nb-day{display:block;font-family:var(--fh);font-size:1.4rem;line-height:1;}
+        .nb-date-btn .nb-month{display:block;font-size:.65rem;font-weight:700;letter-spacing:.1em;opacity:.5;margin-top:.2rem;}
+        .nb-date-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
+        .nb-date-btn.active .nb-month{opacity:.8;}
+        .nb-time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;}
+        .nb-time-btn{padding:1rem;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-family:var(--fh);font-size:1.4rem;letter-spacing:.05em;cursor:pointer;transition:all .2s;}
+        .nb-time-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
+        .nb-guests-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;}
+        .nb-guest-btn{aspect-ratio:1;background:transparent;border:1px solid rgba(225,216,183,.15);color:var(--bone);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+        .nb-guest-btn.active{background:var(--red);border-color:var(--red);color:#151515;}
+        .nb-guest-btn.zero{opacity:.4;}
     </style>
 </head>
 <body>
@@ -162,7 +176,7 @@
         <div class="topbar-brand">HELL <span>PIZZA</span> &mdash; STAFF</div>
         <div class="topbar-right">
             <button class="dev-btn" onclick="toggleDevPanel()"><i data-lucide="settings" size="14"></i>DEV</button>
-            <a href="index.html" class="topbar-link"><i data-lucide="external-link" size="13"></i>BOOKING FORM</a>
+            <button class="btn-new-booking" onclick="openNewBooking()"><i data-lucide="plus" size="14"></i>NEW BOOKING</button>
         </div>
     </header>
 
@@ -202,6 +216,64 @@
     </div>
 </main>
 
+<!-- NEW BOOKING MODAL -->
+<div class="modal-backdrop" id="newBookingModal">
+    <div class="modal-box" style="max-width:520px;">
+        <h2 class="modal-title">NEW BOOKING</h2>
+
+        <!-- Date selector -->
+        <div class="modal-field">
+            <label>Session Date</label>
+            <div class="nb-date-grid" id="nbDateGrid"></div>
+        </div>
+
+        <!-- Time selector -->
+        <div class="modal-field">
+            <label>Arrival Time</label>
+            <div class="nb-time-grid" id="nbTimeGrid">
+                <button type="button" class="nb-time-btn" data-time="5:30" onclick="nbSelectTime('5:30')">5:30 PM</button>
+                <button type="button" class="nb-time-btn" data-time="6:00" onclick="nbSelectTime('6:00')">6:00 PM</button>
+                <button type="button" class="nb-time-btn" data-time="6:30" onclick="nbSelectTime('6:30')">6:30 PM</button>
+            </div>
+        </div>
+
+        <!-- Name -->
+        <div class="modal-field">
+            <label>Name</label>
+            <input type="text" id="nbName" placeholder="Full name" autocomplete="off">
+        </div>
+        <!-- Phone + Email side by side — at least one required -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+            <div class="modal-field">
+                <label>Phone <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(or email)</span></label>
+                <input type="tel" id="nbPhone" placeholder="021 000 000" autocomplete="off">
+            </div>
+            <div class="modal-field">
+                <label>Email <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(or phone)</span></label>
+                <input type="email" id="nbEmail" placeholder="email@example.com" autocomplete="off">
+            </div>
+        </div>
+
+        <!-- Guests -->
+        <div class="modal-field">
+            <label>Guests</label>
+            <div class="nb-guests-grid" id="nbGuestsGrid"></div>
+        </div>
+
+        <!-- Vegs -->
+        <div class="modal-field">
+            <label>Vegetarians <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(optional)</span></label>
+            <div class="nb-guests-grid" id="nbVegsGrid"></div>
+        </div>
+
+        <div class="modal-btns">
+            <button class="btn-solid" onclick="submitNewBooking()" id="nbSubmitBtn">BOOK IN</button>
+            <button class="btn-outline" onclick="closeNewBooking()">CANCEL</button>
+        </div>
+        <p id="nbError" style="color:#C80613;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-top:1rem;display:none;"></p>
+    </div>
+</div>
+
 <!-- EDIT MODAL -->
 <div class="modal-backdrop" id="editModal">
     <div class="modal-box">
@@ -230,7 +302,7 @@ var SB_KEY = 'sb_publishable_I5WfIE7qy58qjLz6TsvqVw_ZI60hNDW';
 var SLOTS  = ['5:30','6:00','6:30'];
 var CAPACITY = 30;
 
-var state = { sessions:[], currentDate:null, devDate:null, controls:{} };
+var state = { sessions:[], currentDate:null, devDate:null, controls:{}, lastSyncedAt:null };
 var MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function localDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -313,10 +385,21 @@ async function fetchSession(index){
         var rows=await sb('bookings?date=eq.'+encodeURIComponent(session.dateStr)+'&order=time.asc,name.asc');
         session.bookings=rows||[];
         session.loaded=true;
-        if(state.currentDate===session.dateStr) renderSessionDetail(index);
+        if(state.currentDate===session.dateStr){
+            renderSessionDetail(index);
+            state.lastSyncedAt=Date.now();
+            updateSyncLabel();
+        }
     }catch(e){session.loaded=true;}
     updateCardBottom(index);
     return true;
+}
+
+function updateSyncLabel(){
+    var el=document.getElementById('lastSynced');
+    if(!el||!state.lastSyncedAt) return;
+    var secs=Math.round((Date.now()-state.lastSyncedAt)/1000);
+    el.textContent=secs<=2?'Bookings synced just now':'Bookings synced '+secs+'s ago';
 }
 
 function showHome(){
@@ -335,14 +418,7 @@ function openSession(i){
 
 function currentIdx(){ return state.sessions.findIndex(function(s){return s.dateStr===state.currentDate;}); }
 
-function refreshSession(){
-    var icon=document.getElementById('refreshIcon');
-    var i=currentIdx();
-    if(icon) icon.classList.add('spin');
-    var done=function(){if(icon) icon.classList.remove('spin');};
-    if(i<0){done();return;}
-    fetchSession(i).finally(done).catch(done);
-}
+// refresh button removed
 
 function renderSessionDetail(index){
     var s=state.sessions[index];
@@ -455,6 +531,147 @@ async function toggleBlock(dateStr){
     state.sessions.forEach(function(_,i){updateCardBottom(i);});
 }
 
+// ── NEW BOOKING ──
+var nb = { date: null, time: null, guests: 1, vegs: 0 };
+
+function openNewBooking(){
+    nb = { date: null, time: null, guests: 1, vegs: 0 };
+    buildNbDates();
+    buildNbGuests();
+    buildNbVegs();
+    document.getElementById('nbName').value = '';
+    document.getElementById('nbEmail').value = '';
+    document.getElementById('nbPhone').value = '';
+    document.getElementById('nbError').style.display = 'none';
+    document.getElementById('nbSubmitBtn').textContent = 'BOOK IN';
+    document.getElementById('nbSubmitBtn').disabled = false;
+    document.getElementById('newBookingModal').classList.add('open');
+    setTimeout(function(){ document.getElementById('nbName').focus(); }, 100);
+}
+
+function closeNewBooking(){
+    document.getElementById('newBookingModal').classList.remove('open');
+}
+
+function buildNbDates(){
+    var grid = document.getElementById('nbDateGrid');
+    var MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    grid.innerHTML = state.sessions.map(function(s){
+        return '<button type="button" class="nb-date-btn'+(nb.date===s.dateStr?' active':'')+'" onclick="nbSelectDate(''+s.dateStr+'')">'
+            +'<span class="nb-day">'+s.day+'</span>'
+            +'<span class="nb-month">'+s.month+'</span>'
+            +'</button>';
+    }).join('');
+}
+
+function nbSelectDate(dateStr){
+    nb.date = dateStr;
+    document.querySelectorAll('.nb-date-btn').forEach(function(b){
+        b.classList.toggle('active', b.onclick.toString().indexOf(dateStr) >= 0);
+    });
+    buildNbDates();
+}
+
+function nbSelectTime(time){
+    nb.time = time;
+    document.querySelectorAll('.nb-time-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.time === time);
+    });
+}
+
+function buildNbGuests(){
+    var grid = document.getElementById('nbGuestsGrid');
+    grid.innerHTML = '';
+    for(var i=1;i<=15;i++){
+        var btn=document.createElement('button');
+        btn.type='button';
+        btn.textContent=i;
+        btn.className='nb-guest-btn'+(i===nb.guests?' active':'');
+        btn.onclick=(function(val){ return function(){
+            nb.guests=val;
+            // Cap vegs to new guest count
+            if(nb.vegs>val) nb.vegs=0;
+            buildNbGuests();
+            buildNbVegs();
+        };})(i);
+        grid.appendChild(btn);
+    }
+}
+
+function buildNbVegs(){
+    var grid = document.getElementById('nbVegsGrid');
+    grid.innerHTML = '';
+    // 0 button first
+    var zero=document.createElement('button');
+    zero.type='button'; zero.textContent='0';
+    zero.className='nb-guest-btn zero'+(nb.vegs===0?' active':'');
+    zero.onclick=function(){ nb.vegs=0; buildNbVegs(); };
+    grid.appendChild(zero);
+    for(var i=1;i<=nb.guests;i++){
+        var btn=document.createElement('button');
+        btn.type='button'; btn.textContent=i;
+        btn.className='nb-guest-btn'+(i===nb.vegs?' active':'');
+        btn.onclick=(function(val){ return function(){ nb.vegs=val; buildNbVegs(); }; })(i);
+        grid.appendChild(btn);
+    }
+}
+
+async function submitNewBooking(){
+    var name  = document.getElementById('nbName').value.trim();
+    var phone = document.getElementById('nbPhone').value.trim();
+    var errEl = document.getElementById('nbError');
+    errEl.style.display = 'none';
+
+    var email = document.getElementById('nbEmail').value.trim();
+    if(!nb.date)           { showNbError('Please select a date'); return; }
+    if(!nb.time)           { showNbError('Please select an arrival time'); return; }
+    if(!name)              { showNbError('Please enter a name'); document.getElementById('nbName').focus(); return; }
+    if(!phone && !email)   { showNbError('Please enter a phone number or email'); document.getElementById('nbPhone').focus(); return; }
+
+    var btn = document.getElementById('nbSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'BOOKING...';
+
+    try {
+        // Generate ref
+        var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', ref='HELL-';
+        for(var i=0;i<6;i++) ref+=chars[Math.floor(Math.random()*chars.length)];
+
+        await sb('bookings', {
+            method: 'POST',
+            body: JSON.stringify({
+                date:        nb.date,
+                time:        nb.time,
+                name:        name,
+                phone:       phone,
+                email:       document.getElementById('nbEmail').value.trim(),
+                guests:      nb.guests,
+                vegetarians: nb.vegs,
+                ref:         ref
+            })
+        });
+
+        closeNewBooking();
+
+        // Refresh the relevant session
+        var idx = state.sessions.findIndex(function(s){ return s.dateStr === nb.date; });
+        if(idx >= 0) fetchSession(idx);
+
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = 'BOOK IN';
+        showNbError('Something went wrong. Try again.');
+    }
+}
+
+function showNbError(msg){
+    var el = document.getElementById('nbError');
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+document.getElementById('newBookingModal').addEventListener('click', function(e){ if(e.target===this) closeNewBooking(); });
+
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escA(s){return String(s||'').replace(/'/g,"\\'");}
 
@@ -463,14 +680,15 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEditMod
 
 init();
 
-// Auto-refresh every 10 seconds — silently updates bookings on all views
+// Auto-refresh every 10 seconds
 setInterval(function(){
     var i=currentIdx();
-    // Refresh current session view if open
     if(i>=0) fetchSession(i);
-    // Also refresh all home cards
     else state.sessions.forEach(function(_,idx){ fetchSession(idx); });
 }, 10000);
+
+// Update "X seconds ago" label every second
+setInterval(updateSyncLabel, 1000);
 </script>
 </body>
 </html>
