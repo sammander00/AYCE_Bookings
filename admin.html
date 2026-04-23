@@ -232,21 +232,27 @@
 
 
         /* -- LOGS -- */
-        .log-row { display:grid; grid-template-columns:140px 80px 1fr auto; align-items:center; gap:1rem; padding:.9rem 1rem; border-bottom:1px solid rgba(225,216,183,.05); font-size:.85rem; }
+        .log-row { display:flex; flex-direction:column; gap:.35rem; padding:1.1rem 1rem; border-bottom:1px solid rgba(225,216,183,.06); transition:background .1s; }
         .log-row:hover { background:rgba(225,216,183,.02); }
-        .log-time { font-size:.7rem; opacity:.35; font-weight:700; letter-spacing:.05em; }
-        .log-action { font-family:var(--fd); font-size:1rem; }
-        .log-action.EDIT { color:#4a9eff; }
-        .log-action.DELETE { color:#e05050; }
-        .log-action.CANCEL { color:#e05050; }
-        .log-action.CHANGE { color:#ff8c00; }
-        .log-actor { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; opacity:.35; text-align:right; }
-        .log-actor.staff { color:var(--red); opacity:.7; }
-        .log-name { font-weight:700; letter-spacing:.04em; }
-        .log-detail { font-size:.75rem; opacity:.4; margin-top:.15rem; }
-        .log-ref { font-size:.7rem; opacity:.25; font-family:monospace; }
-        .logs-header { display:grid; grid-template-columns:140px 80px 1fr auto; gap:1rem; padding:.5rem 1rem; border-bottom:2px solid rgba(225,216,183,.1); margin-bottom:.2rem; }
-        .logs-col-header { font-size:.6rem; font-weight:900; letter-spacing:.2em; text-transform:uppercase; opacity:.35; }
+        .log-top { display:flex; align-items:center; gap:.8rem; }
+        .log-badge { font-size:.6rem; font-weight:900; letter-spacing:.15em; text-transform:uppercase; padding:.2rem .55rem; border-radius:2px; flex-shrink:0; }
+        .log-badge.EDIT    { background:rgba(74,158,255,.12); color:#4a9eff; border:1px solid rgba(74,158,255,.25); }
+        .log-badge.DELETE  { background:rgba(224,80,80,.12); color:#e05050; border:1px solid rgba(224,80,80,.25); }
+        .log-badge.CANCEL  { background:rgba(224,80,80,.12); color:#e05050; border:1px solid rgba(224,80,80,.25); }
+        .log-badge.CHANGE  { background:rgba(255,140,0,.12); color:#ff8c00; border:1px solid rgba(255,140,0,.25); }
+        .log-name-ref { font-size:.9rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+        .log-ref { font-size:.7rem; font-weight:400; opacity:.3; font-family:monospace; margin-left:.4rem; text-transform:none; letter-spacing:.05em; }
+        .log-spacer { flex:1; }
+        .log-meta { display:flex; align-items:center; gap:.8rem; }
+        .log-time { font-size:.7rem; opacity:.3; font-weight:700; letter-spacing:.05em; }
+        .log-actor { font-size:.65rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; opacity:.3; }
+        .log-actor.staff   { color:var(--red); opacity:.65; }
+        .log-actor.customer { color:#4a9eff; opacity:.65; }
+        .log-state { display:flex; align-items:center; gap:.5rem; font-size:.78rem; }
+        .log-state-box { background:rgba(225,216,183,.05); border:1px solid rgba(225,216,183,.1); padding:.3rem .7rem; border-radius:2px; font-family:var(--fb); color:rgba(225,216,183,.6); letter-spacing:.03em; }
+        .log-arrow { opacity:.3; font-size:.8rem; }
+        .log-state-box.after { border-color:rgba(225,216,183,.2); color:var(--bone); }
+        .log-state-box.deleted { border-color:rgba(224,80,80,.2); color:#e05050; }
 
         /* refresh button removed */
         .btn-new-booking{background:var(--red);border:1px solid var(--red);color:#151515;padding:.5rem 1.2rem;font-family:var(--fh);font-size:.95rem;letter-spacing:.12em;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;gap:.5rem;}
@@ -616,11 +622,16 @@ async function saveEdit(){
     var ref=document.getElementById('editRef').value;
     var payload={name:document.getElementById('editName').value,phone:document.getElementById('editPhone').value,guests:parseInt(document.getElementById('editGuests').value),time:document.getElementById('editTime').value};
     var i=currentIdx();
-    if(i>=0){var b=state.sessions[i].bookings.find(function(b){return b.ref===ref;});if(b)Object.assign(b,payload);renderSessionDetail(i);updateCardBottom(i);}
+    var before={};
+    if(i>=0){
+        var b=state.sessions[i].bookings.find(function(b){return b.ref===ref;});
+        if(b){ before={date:b.date,time:b.time,guests:b.guests}; Object.assign(b,payload); }
+        renderSessionDetail(i);updateCardBottom(i);
+    }
     closeEditModal();
     try{
         await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});
-        await logAction(ref,'EDIT','staff',payload.name,{guests:payload.guests,time:payload.time});
+        await logAction(ref,'EDIT','staff',payload.name,{before:before,after:{date:before.date,time:payload.time,guests:payload.guests}});
         logsState.loaded=false;
         setTimeout(function(){fetchSession(i);},500);
     }
@@ -1089,6 +1100,19 @@ async function loadLogs() {
     renderLogs();
 }
 
+function fmtLogDate(dateStr) {
+    if (!dateStr) return '--';
+    var p = dateStr.split('-');
+    return p[2] + '/' + p[1] + '/' + p[0].slice(2);
+}
+
+function fmtStateBox(state, cls) {
+    if (!state || !state.date) return '';
+    return '<div class="log-state-box ' + (cls||'') + '">'
+        + fmtLogDate(state.date) + ' | ' + (state.time||'--') + 'pm | ' + (state.guests||'--') + ' guests'
+        + '</div>';
+}
+
 function renderLogs() {
     var el = document.getElementById('logsList');
     if (!el) return;
@@ -1096,30 +1120,36 @@ function renderLogs() {
         el.innerHTML = '<p class="past-empty">No activity logged yet</p>';
         return;
     }
-    var html = '<div class="logs-header">'
-        + '<div class="logs-col-header">Time</div>'
-        + '<div class="logs-col-header">Action</div>'
-        + '<div class="logs-col-header">Details</div>'
-        + '<div class="logs-col-header">By</div>'
-        + '</div>';
 
-    html += logsState.entries.map(function(log) {
+    var html = logsState.entries.map(function(log) {
         var d = new Date(log.timestamp);
-        var timeStr = d.toLocaleDateString('en-NZ', {day:'numeric',month:'short',year:'numeric'})
-            + ' ' + d.toLocaleTimeString('en-NZ', {hour:'2-digit',minute:'2-digit'});
+        var timeStr = d.toLocaleDateString('en-NZ',{day:'numeric',month:'short'})
+            + ' ' + d.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit'});
         var det = log.details || {};
-        var detailStr = '';
-        if (log.action === 'EDIT') detailStr = (det.guests ? det.guests + ' guests' : '') + (det.time ? ' &bull; ' + det.time + ' PM' : '');
-        if (log.action === 'CHANGE') detailStr = (det.oldDate ? det.oldDate + ' ' + det.oldTime + 'pm &rarr; ' : '') + (det.newDate ? det.newDate + ' ' + det.newTime + 'pm' : '');
-        if (log.action === 'CANCEL' || log.action === 'DELETE') detailStr = (det.date || '') + (det.time ? ' &bull; ' + det.time + 'pm' : '') + (det.guests ? ' &bull; ' + det.guests + ' guests' : '');
+        var stateHtml = '';
+
+        if ((log.action === 'EDIT' || log.action === 'CHANGE') && det.before && det.after) {
+            stateHtml = '<div class="log-state">'
+                + fmtStateBox(det.before, '')
+                + '<span class="log-arrow">&#8594;</span>'
+                + fmtStateBox(det.after, 'after')
+                + '</div>';
+        } else if (log.action === 'DELETE' || log.action === 'CANCEL') {
+            stateHtml = '<div class="log-state">'
+                + fmtStateBox({date:det.date,time:det.time,guests:det.guests}, 'deleted')
+                + '</div>';
+        }
 
         return '<div class="log-row">'
-            + '<div class="log-time">' + timeStr + '</div>'
-            + '<div class="log-action ' + log.action + '">' + log.action + '</div>'
-            + '<div><div class="log-name">' + esc(log.name || '') + ' <span class="log-ref">' + esc(log.ref) + '</span></div>'
-            + (detailStr ? '<div class="log-detail">' + detailStr + '</div>' : '')
-            + '</div>'
-            + '<div class="log-actor ' + (log.actor||'') + '">' + (log.actor||'') + '</div>'
+            + '<div class="log-top">'
+            + '<span class="log-badge ' + log.action + '">' + log.action + '</span>'
+            + '<span class="log-name-ref">' + esc(log.name||'') + '<span class="log-ref">' + esc(log.ref) + '</span></span>'
+            + '<span class="log-spacer"></span>'
+            + '<div class="log-meta">'
+            + '<span class="log-time">' + timeStr + '</span>'
+            + '<span class="log-actor ' + (log.actor||'') + '">' + (log.actor||'') + '</span>'
+            + '</div></div>'
+            + stateHtml
             + '</div>';
     }).join('');
 

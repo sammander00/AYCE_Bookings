@@ -497,7 +497,7 @@
                     body: JSON.stringify({ date: manageState.selectedDate, time: manageState.selectedTime })
                 });
                 fetch(APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'CHANGE', ref: manageState.ref, date: manageState.selectedDate, time: manageState.selectedTime }) });
-                await logAction(manageState.ref, 'CHANGE', 'customer', manageState.booking.name, { newDate: manageState.selectedDate, newTime: manageState.selectedTime, oldDate: manageState.booking.date, oldTime: manageState.booking.time });
+                await logAction(manageState.ref, 'CHANGE', 'customer', manageState.booking.name, { before:{date:manageState.booking.date,time:manageState.booking.time,guests:manageState.booking.guests}, after:{date:manageState.selectedDate,time:manageState.selectedTime,guests:manageState.booking.guests} });
                 showState('successState');
             } catch (err) {
                 alert('Something went wrong. Please try again.');
