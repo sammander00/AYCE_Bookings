@@ -500,6 +500,8 @@ async function init(){
     renderHome();
     // Fetch all sessions in parallel
     await Promise.all(state.sessions.map(function(_,i){return fetchSession(i);}));
+    // Start realtime subscription after data is loaded
+    initRealtime();
 }
 
 function renderHome(){
@@ -1290,8 +1292,7 @@ function startPollingFallback() {
     }, 10000);
 }
 
-// Start realtime -- falls back to 10s polling automatically if it fails
-initRealtime();
+// initRealtime() is called inside init() after login
 
 // Keep polling as a safety net regardless (catches edge cases realtime misses)
 setInterval(function(){
