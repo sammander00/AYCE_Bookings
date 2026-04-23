@@ -359,7 +359,7 @@
                 <input type="tel" id="nbPhone" placeholder="021 000 000" autocomplete="off">
             </div>
             <div class="modal-field">
-                <label>Email <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(or phone)</span></label>
+                <label>Email <span style="color:var(--red)">*</span></label>
                 <input type="email" id="nbEmail" placeholder="email@example.com" autocomplete="off">
             </div>
         </div>
@@ -937,7 +937,7 @@ async function submitNewBooking(){
     if(!nb.date)           { showNbError('Please select a date'); return; }
     if(!nb.time)           { showNbError('Please select an arrival time'); return; }
     if(!name)              { showNbError('Please enter a name'); document.getElementById('nbName').focus(); return; }
-    if(!phone && !email)   { showNbError('Please enter a phone number or email'); document.getElementById('nbPhone').focus(); return; }
+    if(!email)   { showNbError('Please enter a customer email'); document.getElementById('nbEmail').focus(); return; }
 
     var btn = document.getElementById('nbSubmitBtn');
     btn.disabled = true;
