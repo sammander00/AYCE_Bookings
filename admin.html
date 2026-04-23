@@ -618,7 +618,12 @@ async function saveEdit(){
     var i=currentIdx();
     if(i>=0){var b=state.sessions[i].bookings.find(function(b){return b.ref===ref;});if(b)Object.assign(b,payload);renderSessionDetail(i);updateCardBottom(i);}
     closeEditModal();
-    try{await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});setTimeout(function(){fetchSession(i);},500);}
+    try{
+        await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'PATCH',body:JSON.stringify(payload)});
+        await logAction(ref,'EDIT','staff',payload.name,{guests:payload.guests,time:payload.time});
+        logsState.loaded=false;
+        setTimeout(function(){fetchSession(i);},500);
+    }
     catch(e){alert('Save may have failed -- please refresh.');}
 }
 
@@ -626,8 +631,14 @@ async function saveEdit(){
 async function delBooking(ref){
     if(!confirm('REMOVE THIS BOOKING?'))return;
     var i=currentIdx();
+    var b2 = i>=0 && state.sessions[i].bookings.find(function(b){return b.ref===ref;});
     if(i>=0){state.sessions[i].bookings=state.sessions[i].bookings.filter(function(b){return b.ref!==ref;});renderSessionDetail(i);updateCardBottom(i);}
-    try{await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'DELETE'});setTimeout(function(){fetchSession(i);},500);}
+    try{
+        await sb('bookings?ref=eq.'+encodeURIComponent(ref),{method:'DELETE'});
+        await logAction(ref,'DELETE','staff',b2?b2.name:'unknown',{date:b2?b2.date:'',time:b2?b2.time:'',guests:b2?b2.guests:''});
+        logsState.loaded=false;
+        setTimeout(function(){fetchSession(i);},500);
+    }
     catch(e){alert('Delete may have failed -- please refresh.');}
 }
 
@@ -1067,7 +1078,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEditMod
 var logsState = { entries: [], loaded: false };
 
 async function loadLogs() {
-    if (logsState.loaded) { renderLogs(); return; }
+    logsState.loaded = false; // always reload fresh
     var el = document.getElementById('logsList');
     if (el) el.innerHTML = '<div class="empty-slot">Loading logs...</div>';
     try {
