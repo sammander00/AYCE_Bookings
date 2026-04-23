@@ -365,7 +365,16 @@
     </main>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec";
+        const SB_URL = 'https://zmhfympqxvdkotyjzvuk.supabase.co';
+        const SB_KEY = 'sb_publishable_I5WfIE7qy58qjLz6TsvqVw_ZI60hNDW';
+        const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec';
+
+        async function sbFetch(path, opts) {
+            var res = await fetch(SB_URL + '/rest/v1/' + path, Object.assign({
+                headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }
+            }, opts || {}));
+            var t = await res.text(); return t ? JSON.parse(t) : null;
+        }
         const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
         const FULL_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -394,21 +403,13 @@
         async function loadBooking() {
             showState('loadingState');
             try {
-                const url = new URL(API_URL);
-                url.searchParams.set('ref', manageState.ref);
-                const res = await fetch(url);
-                const data = await res.json();
-
-                if (!data.booking) {
-                    showState('errorState');
-                    return;
-                }
-
-                manageState.booking = data.booking;
-                manageState.selectedDate = data.booking.date;
-                manageState.selectedTime = data.booking.time;
-
-                populateDetails(data.booking);
+                var rows = await sbFetch('bookings?ref=eq.' + encodeURIComponent(manageState.ref));
+                if (!rows || rows.length === 0) { showState('errorState'); return; }
+                var booking = rows[0];
+                manageState.booking = booking;
+                manageState.selectedDate = booking.date;
+                manageState.selectedTime = booking.time;
+                populateDetails(booking);
                 buildDateSelector();
                 updateTimeBtns();
                 showState('bookingDetails');
@@ -480,18 +481,13 @@
             const btn = document.getElementById('saveChangeBtn');
             btn.disabled = true;
             btn.textContent = 'SAVING...';
-
             try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        action: 'CHANGE',
-                        ref: manageState.ref,
-                        date: manageState.selectedDate,
-                        time: manageState.selectedTime
-                    })
+                await sbFetch('bookings?ref=eq.' + encodeURIComponent(manageState.ref), {
+                    method: 'PATCH',
+                    body: JSON.stringify({ date: manageState.selectedDate, time: manageState.selectedTime })
                 });
+                // Send change notification email via Apps Script
+                fetch(APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'CHANGE', ref: manageState.ref, date: manageState.selectedDate, time: manageState.selectedTime }) });
                 showState('successState');
             } catch (err) {
                 alert('Something went wrong. Please try again.');
@@ -502,17 +498,8 @@
 
         async function cancelBooking() {
             if (!confirm('Are you sure you want to cancel your booking?')) return;
-
             try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        action: 'DELETE',
-                        ref: manageState.ref,
-                        timestamp: manageState.booking.timestamp
-                    })
-                });
+                await sbFetch('bookings?ref=eq.' + encodeURIComponent(manageState.ref), { method: 'DELETE' });
                 showState('cancelledState');
                 lucide.createIcons();
             } catch (err) {
