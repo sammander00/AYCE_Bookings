@@ -109,7 +109,7 @@
         .b-name{font-size:.95rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
         .b-guests{font-family:var(--fh);font-size:1.6rem;color:var(--red);line-height:1;text-align:center;}
         .b-guests-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;opacity:.35;text-transform:uppercase;text-align:center;}
-        .b-vegs{font-family:var(--fh);font-size:1.4rem;color:var(--red);line-height:1;text-align:center;}
+        .b-vegs{font-family:var(--fh);font-size:1.6rem;color:var(--red);line-height:1;text-align:center;}
         .b-actions{display:flex;gap:.35rem;justify-content:flex-end;}
         .b-source{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
         .source-icon{color:var(--red);display:flex;align-items:center;justify-content:center;}
@@ -718,8 +718,8 @@ function renderSessionDetail(index){
             ?rows.map(function(b){
                 return '<div class="booking-row">'
                     +'<div class="b-name">'+esc(b.name)+'</div>'
-                    +'<div style="display:flex;flex-direction:column;align-items:center;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
-                    +'<div style="display:flex;flex-direction:column;align-items:center;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
+                    +'<div style="display:flex;flex-direction:column;align-items:center;width:70px;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
+                    +'<div style="display:flex;flex-direction:column;align-items:center;width:70px;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="source-badge-label">source</div></div>'
                     +'<div class="b-actions">'
                     +'<button class="icon-btn" onclick="openEdit(\'+escA(b.ref)+\'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
