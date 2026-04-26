@@ -722,8 +722,8 @@ function renderSessionDetail(index){
                     +'<div style="display:flex;flex-direction:column;align-items:center;width:70px;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="source-badge-label">source</div></div>'
                     +'<div class="b-actions">'
-                    +'<button class="icon-btn" onclick="openEdit(\'+escA(b.ref)+\'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
-                    +'<button class="icon-btn del" onclick="delBooking(\'+escA(b.ref)+\'\')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
+                    +'<button class="icon-btn" onclick="openEdit(&apos;'+escA(b.ref)+'&apos;)" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
+                    +'<button class="icon-btn del" onclick="delBooking(&apos;'+escA(b.ref)+'&apos;)" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
                     +'</div></div>';
             }).join('')
             :'<div class="empty-slot">No bookings yet</div>';
