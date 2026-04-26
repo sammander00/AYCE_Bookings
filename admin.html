@@ -102,9 +102,9 @@
         .slot-group-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:.8rem;margin-bottom:0;border-bottom:2px solid rgba(225,216,183,.12);}
         .slot-group-title{font-family:var(--fd);font-size:2rem;color:var(--bone);}
         .slot-group-meta{font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--red);}
-        .booking-col-headers{display:grid;grid-template-columns:1fr auto auto;gap:1rem;padding:.7rem 1rem;border-bottom:1px solid rgba(225,216,183,.06);background:rgba(225,216,183,.025);}
+        .booking-col-headers{display:grid;grid-template-columns:2fr 70px 70px 50px auto;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid rgba(225,216,183,.06);background:rgba(225,216,183,.025);}
         .col-header{font-size:.65rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;opacity:.4;}
-        .booking-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:1rem;padding:1.1rem 1rem;border-bottom:1px solid rgba(225,216,183,.05);transition:background .12s;}
+        .booking-row{display:grid;grid-template-columns:2fr 70px 70px 50px auto;align-items:center;gap:.8rem;padding:1.1rem 1rem;border-bottom:1px solid rgba(225,216,183,.05);transition:background .12s;}
         .booking-row:hover{background:rgba(225,216,183,.025);}
         .b-name{font-size:.95rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
         .b-guests{font-family:var(--fh);font-size:1.6rem;color:var(--red);line-height:1;text-align:center;}
@@ -148,19 +148,22 @@
             .slot-group-title{color:black;font-size:13pt;}
             .slot-group-meta{color:#C80613;font-size:8pt;}
             /* Booking rows - name, guests, vegs only, no labels under numbers */
-            .booking-row{display:grid!important;grid-template-columns:3fr 1fr 1fr!important;align-items:center;border-bottom:1px solid #ddd!important;padding:3mm 0!important;gap:.5rem;}
+            .booking-row{display:grid!important;grid-template-columns:3fr 60px 60px!important;align-items:center;border-bottom:1px solid #ddd!important;padding:3mm 0!important;gap:.5rem;}
             .b-name{color:#C80613!important;font-size:10pt;font-weight:700;}
-            /* The guests/vegs wrapper divs */
-            .booking-row > div[style*="flex-direction:column"]{display:flex!important;align-items:center!important;justify-content:center!important;}
+            /* Strip flex wrapper, show raw number directly */
+            .booking-row > div[style*="flex"]{display:contents!important;}
             .b-guests{color:#C80613!important;font-size:11pt;font-weight:700;}
             .b-guests-label{display:none!important;}
             .b-vegs{color:#C80613!important;font-size:11pt;font-weight:700;}
             .b-source{display:none!important;}
+            .b-actions{display:none!important;}
             /* Column headers */
-            .print-col-headers{display:grid!important;grid-template-columns:3fr 1fr 1fr!important;gap:.5rem;padding:2mm 0;border-bottom:1.5px solid #111;}
+            .print-col-headers{display:grid!important;grid-template-columns:3fr 60px 60px!important;gap:.5rem;padding:2mm 0;border-bottom:1.5px solid #111;}
             .print-col-header{font-size:7pt;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#444;}
             .empty-slot{color:#999;font-size:8pt;}
-            @page{size:A4;margin:10mm 10mm 10mm 10mm;}
+            @page{size:A4;margin:10mm;marks:none;}
+            head{display:none!important;}
+            title{display:none!important;}
         }
         .print-col-headers{display:none;grid-template-columns:3fr 1fr 1fr;gap:1rem;padding:.5rem 0;margin-bottom:.3rem;border-bottom:1px solid #ccc;}
         .print-col-header{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#666;}
@@ -715,11 +718,9 @@ function renderSessionDetail(index){
             ?rows.map(function(b){
                 return '<div class="booking-row">'
                     +'<div class="b-name">'+esc(b.name)+'</div>'
-                    +'<div style="display:flex;gap:1.2rem;align-items:flex-start;">'
                     +'<div style="display:flex;flex-direction:column;align-items:center;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
                     +'<div style="display:flex;flex-direction:column;align-items:center;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="source-badge-label">source</div></div>'
-                    +'</div>'
                     +'<div class="b-actions">'
                     +'<button class="icon-btn" onclick="openEdit(\'+escA(b.ref)+\'\')" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
                     +'<button class="icon-btn del" onclick="delBooking(\'+escA(b.ref)+\'\')" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
@@ -1284,10 +1285,10 @@ function fmtLogDate(dateStr) {
     return p[2] + '/' + p[1] + '/' + p[0].slice(2);
 }
 
-function fmtStateBox(state, cls) {
-    if (!state || !state.date) return '';
+function fmtStateBox(bkState, cls) {
+    if (!bkState || !bkState.date) return '';
     return '<div class="log-state-box ' + (cls||'') + '">'
-        + fmtLogDate(state.date) + ' | ' + (state.time||'--') + 'pm | ' + (state.guests||'--') + ' guests'
+        + fmtLogDate(bkState.date) + ' | ' + (bkState.time||'--') + 'pm | ' + (bkState.guests||'--') + ' guests'
         + '</div>';
 }
 
