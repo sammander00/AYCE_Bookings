@@ -97,15 +97,18 @@
         .slot-group-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:.8rem;margin-bottom:0;border-bottom:2px solid rgba(225,216,183,.12);}
         .slot-group-title{font-family:var(--fd);font-size:2rem;color:var(--bone);}
         .slot-group-meta{font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--red);}
-        .booking-col-headers{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:1rem;padding:.7rem 1rem;border-bottom:1px solid rgba(225,216,183,.06);background:rgba(225,216,183,.025);}
+        .booking-col-headers{display:grid;grid-template-columns:2fr 1fr 1fr 55px auto;gap:1rem;padding:.7rem 1rem;border-bottom:1px solid rgba(225,216,183,.06);background:rgba(225,216,183,.025);}
         .col-header{font-size:.65rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;opacity:.4;}
-        .booking-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;align-items:center;gap:1rem;padding:1.1rem 1rem;border-bottom:1px solid rgba(225,216,183,.05);transition:background .12s;}
+        .booking-row{display:grid;grid-template-columns:2fr 1fr 1fr 55px auto;align-items:center;gap:1rem;padding:1.1rem 1rem;border-bottom:1px solid rgba(225,216,183,.05);transition:background .12s;}
         .booking-row:hover{background:rgba(225,216,183,.025);}
         .b-name{font-size:.95rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
         .b-guests{font-family:var(--fh);font-size:1.6rem;color:var(--red);line-height:1;}
         .b-guests-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;opacity:.35;text-transform:uppercase;}
         .b-vegs{font-family:var(--fh);font-size:1.4rem;color:var(--red);line-height:1;}
         .b-actions{display:flex;gap:.35rem;justify-content:flex-end;}
+        .b-source{display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;}
+        .source-icon{color:var(--red);display:flex;align-items:center;}
+        .source-badge-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;opacity:.35;text-transform:uppercase;}
         .icon-btn{width:30px;height:30px;background:none;border:1px solid rgba(225,216,183,.1);color:var(--bone);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;opacity:.5;}
         .icon-btn:hover{opacity:1;border-color:var(--red);color:var(--red);}
         .icon-btn.del:hover{border-color:#e05050;color:#e05050;}
@@ -138,7 +141,7 @@
             .slot-group-header{border-bottom:2px solid #222!important;}
             .slot-group-title{color:black;}
             .slot-group-meta{color:#C80613;}
-            .booking-row{grid-template-columns:2fr 1fr 1fr!important;border-bottom:1px solid #ddd!important;padding:.7rem 0!important;}
+            .booking-row{grid-template-columns:2fr 1fr 1fr 55px!important;border-bottom:1px solid #ddd!important;padding:.7rem 0!important;}
             .b-name{color:black;font-size:.9rem;}
             .b-guests{color:#C80613;font-size:1.2rem;}
             .b-guests-label{color:#999;opacity:1;}
@@ -597,7 +600,7 @@ function renderSessionDetail(index){
         var rowsHtml=rows.length>0
             ?rows.map(function(b){
                 return '<div class="booking-row">'
-                    +'<div class="b-name">'+(b.source==='staff'?'<span title="Staff booking" style="margin-right:5px;font-size:11px;">📞</span>':'<span title="Online booking" style="margin-right:5px;font-size:11px;">🌐</span>')+esc(b.name)+'</div>'
+                    +'<div class="b-name">'+esc(b.name)+'</div>'
                     +'<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
                     +'<div><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-actions">'
