@@ -147,19 +147,20 @@
             .slot-group-header{border-bottom:1.5px solid #111!important;padding-bottom:2mm;margin-bottom:0;}
             .slot-group-title{color:black;font-size:13pt;}
             .slot-group-meta{color:#C80613;font-size:8pt;}
-            /* Booking rows - 3 columns: name, guests, vegs */
-            .booking-row{display:grid!important;grid-template-columns:3fr 1fr 1fr!important;border-bottom:1px solid #ddd!important;padding:3mm 0!important;gap:.5rem;}
-            .b-name{color:black;font-size:10pt;font-weight:700;}
-            .b-guests{color:black;font-size:11pt;font-weight:700;}
-            .b-guests-label{color:#666;opacity:1;font-size:7pt;}
-            .b-vegs{color:black;font-size:11pt;font-weight:700;}
+            /* Booking rows - name, guests, vegs only, no labels under numbers */
+            .booking-row{display:grid!important;grid-template-columns:3fr 1fr 1fr!important;align-items:center;border-bottom:1px solid #ddd!important;padding:3mm 0!important;gap:.5rem;}
+            .b-name{color:#C80613!important;font-size:10pt;font-weight:700;}
+            /* The guests/vegs wrapper divs */
+            .booking-row > div[style*="flex-direction:column"]{display:flex!important;align-items:center!important;justify-content:center!important;}
+            .b-guests{color:#C80613!important;font-size:11pt;font-weight:700;}
+            .b-guests-label{display:none!important;}
+            .b-vegs{color:#C80613!important;font-size:11pt;font-weight:700;}
             .b-source{display:none!important;}
             /* Column headers */
             .print-col-headers{display:grid!important;grid-template-columns:3fr 1fr 1fr!important;gap:.5rem;padding:2mm 0;border-bottom:1.5px solid #111;}
             .print-col-header{font-size:7pt;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#444;}
             .empty-slot{color:#999;font-size:8pt;}
-            /* Fit to page */
-            @page{size:A4;margin:0;}
+            @page{size:A4;margin:10mm 10mm 10mm 10mm;}
         }
         .print-col-headers{display:none;grid-template-columns:3fr 1fr 1fr;gap:1rem;padding:.5rem 0;margin-bottom:.3rem;border-bottom:1px solid #ccc;}
         .print-col-header{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#666;}
