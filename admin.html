@@ -1217,22 +1217,20 @@ async function submitNewBooking(){
         // Send confirmation email if customer email was provided
         if (email) {
             var manageUrl = 'https://aycepizza.bond/manage.html?ref=' + ref;
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    action:      'EMAIL_ONLY',
-                    name:        name,
-                    email:       email,
-                    phone:       phone,
-                    date:        nb.date,
-                    time:        nb.time,
-                    guests:      parseInt(nb.guests) || 1,
-                    vegetarians: nb.vegs,
-                    ref:         ref,
-                    manageUrl:   manageUrl
-                })
-            });
+            // Capture nb values NOW before closeNewBooking resets them
+            var emailPayload = {
+                action:      'EMAIL_ONLY',
+                name:        name,
+                email:       email,
+                phone:       phone,
+                date:        String(nb.date || ''),
+                time:        String(nb.time || ''),
+                guests:      parseInt(nb.guests) || 1,
+                vegetarians: parseInt(nb.vegs) || 0,
+                ref:         ref,
+                manageUrl:   manageUrl
+            };
+            fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailPayload) });
         }
 
         closeNewBooking();
