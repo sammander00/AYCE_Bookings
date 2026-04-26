@@ -597,7 +597,7 @@ function renderSessionDetail(index){
         var rowsHtml=rows.length>0
             ?rows.map(function(b){
                 return '<div class="booking-row">'
-                    +'<div class="b-name">'+esc(b.name)+'</div>'
+                    +'<div class="b-name">'+(b.source==='staff'?'<span title="Staff booking" style="margin-right:5px;font-size:11px;">📞</span>':'<span title="Online booking" style="margin-right:5px;font-size:11px;">🌐</span>')+esc(b.name)+'</div>'
                     +'<div><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
                     +'<div><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-actions">'
@@ -1088,7 +1088,8 @@ async function submitNewBooking(){
                 email:       document.getElementById('nbEmail').value.trim(),
                 guests:      nb.guests,
                 vegetarians: nb.vegs,
-                ref:         ref
+                ref:         ref,
+                source:      'staff'
             })
         });
 

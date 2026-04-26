@@ -15,7 +15,7 @@ let appState = {
     ],
     loading: false,
     vegCount: 0,
-    vegYes: false,
+    vegYes: null,  // null = not yet answered
     allDates: []
 };
 
@@ -276,7 +276,7 @@ function resetForm() {
     appState.selectedTime = null;
     appState.numGuests = 1;
     appState.slots.forEach(function(s) { s.booked = 0; s.forcedSoldOut = false; });
-    appState.vegYes = false;
+    appState.vegYes = null;
     appState.vegCount = 0;
     setVeg(false);
     updateGuestUI();
@@ -296,6 +296,13 @@ async function handleFormSubmit(e) {
     }
     if (!appState.selectedTime) {
         gsap.to(elements.slotBtns, { x: 5, repeat: 5, yoyo: true, duration: 0.05 });
+        return;
+    }
+    if (appState.vegYes === null) {
+        var vegGroup = document.querySelector('.input-group .veg-btn').closest('.input-group');
+        gsap.to(vegGroup, { x: 5, repeat: 5, yoyo: true, duration: 0.05 });
+        vegGroup.style.outline = '1px solid rgba(200,6,19,0.5)';
+        setTimeout(function() { vegGroup.style.outline = ''; }, 2000);
         return;
     }
     if (!document.getElementById('termsAccepted').checked) {
@@ -335,7 +342,8 @@ async function handleFormSubmit(e) {
                 email:       formData.email,
                 guests:      formData.guests,
                 vegetarians: formData.vegetarians,
-                ref:         formData.ref
+                ref:         formData.ref,
+                source:      'online'
             })
         });
 
