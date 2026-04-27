@@ -196,10 +196,12 @@
         /* Placeholder cards */
         .placeholder-page { display:none; }
         @media print {
-            .placeholder-page { display:block!important; page-break-after:always; }
+            .placeholder-page { display:block!important; }
             #sessionView.print-placeholders-mode { display:none!important; }
             body.print-placeholders #placeholderPrintArea { display:block!important; }
             body.print-placeholders #sessionView { display:none!important; }
+            body.print-placeholders .wrap { display:none!important; }
+            body.print-placeholders .texture { display:none!important; }
             .placeholder-card {
                 width:100%; height:100vh;
                 display:flex; flex-direction:column;
@@ -209,8 +211,8 @@
                 text-align:center;
                 padding:20mm;
                 margin:0;
-                page-break-inside:avoid;
                 page-break-after:always;
+                break-after:page;
             }
             @page { size:A4 landscape; margin:0; }
             .ph-reserved { font-size:52pt; font-weight:900; text-decoration:underline; margin-bottom:8mm; color:#000; }
@@ -1430,11 +1432,11 @@ function printPlaceholders() {
             + '<div class="ph-name">' + esc(b.name) + ' ' + b.guests + 'pax</div>'
             + '<div class="ph-time">' + b.time + 'pm</div>'
             + '</div>';
-    }).join('<div class="placeholder-page"></div>');
+    }).join('');
 
     // Inject into placeholder area and print
     var area = document.getElementById('placeholderPrintArea');
-    area.innerHTML = '<div class="placeholder-page">' + cards + '</div>';
+    area.innerHTML = cards;
     area.style.display = 'block';
 
     // Hide session view, print placeholders, restore
