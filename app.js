@@ -133,13 +133,7 @@ function initDatePicker() {
                 if (prompt) prompt.style.display = 'none';
                 if (slots) slots.style.display = '';
                 // Show mobile slots, hide mobile prompt
-                // Show mobile slots wrapper
-                var mobileWrapper = document.querySelector('.mobile-slots');
-                if (mobileWrapper) mobileWrapper.style.display = 'block';
-                var promptM = document.getElementById('selectDatePromptMobile');
-                var slotsM = document.getElementById('slotsContainerMobile');
-                if (promptM) promptM.style.display = 'none';
-                if (slotsM) slotsM.style.display = 'grid';
+
                 updateSlotsUI();
                 fetchAvailability(ds);
 
@@ -246,36 +240,6 @@ function updateGuestUI() {
     document.getElementById('numGuests').value = appState.numGuests;
 }
 
-
-function updateMobileSlots() {
-    var container = document.getElementById('slotsContainerMobile');
-    if (!container) return;
-    container.innerHTML = '';
-    appState.slots.forEach(function(slot) {
-        var remaining = Math.max(0, slot.capacity - slot.booked);
-        var soldOut = slot.forcedSoldOut || remaining <= 0;
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'slot-btn' + (soldOut ? ' disabled' : '') + (appState.selectedTime === slot.time ? ' active' : '');
-        btn.disabled = soldOut;
-        btn.innerHTML = '<span class="time">' + slot.time + ' PM</span>'
-            + '<span class="availability">' + (soldOut ? 'SOLD OUT' : remaining + ' SEATS LEFT') + '</span>';
-        (function(t) {
-            btn.addEventListener('click', function() {
-                if (soldOut) return;
-                appState.selectedTime = t;
-                document.getElementById('selectedTime').value = t;
-                document.querySelectorAll('.slot-btn').forEach(function(b) { b.classList.remove('active'); });
-                btn.classList.add('active');
-                document.querySelectorAll('#slotsContainer .slot-btn').forEach(function(b) {
-                    if (b.dataset.time === t) b.classList.add('active');
-                });
-            });
-        })(slot.time);
-        container.appendChild(btn);
-    });
-}
-
 function updateSlotsUI() {
     elements.slotBtns.forEach(function(btn) {
         var time = btn.dataset.time;
@@ -299,7 +263,6 @@ function updateSlotsUI() {
         btn.classList.toggle('active', appState.selectedTime === time);
     });
     document.getElementById('selectedTime').value = appState.selectedTime || '';
-    updateMobileSlots();
 }
 
 function showScreen(screenId) {
