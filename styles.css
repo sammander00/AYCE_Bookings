@@ -349,10 +349,21 @@ input:focus {
 /* Form Footer moved to booking-grid for responsiveness */
 @media (max-width: 850px) {
     .desktop-only-prompt { display: none !important; }
+
     .booking-grid {
         grid-template-columns: 1fr;
     }
-    .form-slots { display: none !important; }
+
+    /* KEEP right column visible (fixes veg selector disappearing) */
+    .form-slots {
+        display: block !important;
+        width: 100%;
+    }
+
+    /* Hide ONLY desktop time slots */
+    #slotsContainer {
+        display: none !important;
+    }
 }
 
 @media (min-width: 851px) {
