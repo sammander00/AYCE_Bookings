@@ -127,11 +127,16 @@ function initDatePicker() {
                 btn.classList.add('active');
                 elements.dateError.style.display = 'none';
                 appState.slots.forEach(function(s) { s.booked = 0; s.forcedSoldOut = false; });
-                // Show slots, hide prompt
+                // Show slots, hide prompt (desktop)
                 var prompt = document.getElementById('selectDatePrompt');
                 var slots = document.getElementById('slotsContainer');
                 if (prompt) prompt.style.display = 'none';
                 if (slots) slots.style.display = '';
+                // Show mobile slots, hide mobile prompt
+                var promptM = document.getElementById('selectDatePromptMobile');
+                var slotsM = document.getElementById('slotsContainerMobile');
+                if (promptM) promptM.style.display = 'none';
+                if (slotsM) slotsM.style.display = '';
                 updateSlotsUI();
                 fetchAvailability(ds);
 
