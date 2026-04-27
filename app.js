@@ -127,6 +127,11 @@ function initDatePicker() {
                 btn.classList.add('active');
                 elements.dateError.style.display = 'none';
                 appState.slots.forEach(function(s) { s.booked = 0; s.forcedSoldOut = false; });
+                // Show slots, hide prompt
+                var prompt = document.getElementById('selectDatePrompt');
+                var slots = document.getElementById('slotsContainer');
+                if (prompt) prompt.style.display = 'none';
+                if (slots) slots.style.display = '';
                 updateSlotsUI();
                 fetchAvailability(ds);
             };
