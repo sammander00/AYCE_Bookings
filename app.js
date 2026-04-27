@@ -367,7 +367,7 @@ async function handleFormSubmit(e) {
     var manageUrl = 'https://aycepizza.bond/manage.html?ref=' + bookingRef;
 
     var formData = {
-        name:        document.getElementById('custName').value,
+        name:        document.getElementById('custFirstName').value.trim() + ' ' + document.getElementById('custLastName').value.trim(),
         phone:       document.getElementById('custPhone').value,
         email:       document.getElementById('custEmail').value,
         guests:      appState.numGuests,
@@ -380,6 +380,7 @@ async function handleFormSubmit(e) {
 
     try {
         setLoading(true);
+        var startTime = Date.now();
 
         // Write to Supabase
         await sbFetch('bookings', {
@@ -408,6 +409,12 @@ async function handleFormSubmit(e) {
         var slot = appState.slots.find(function(s) { return s.time === formData.time; });
         if (slot) slot.booked += formData.guests;
         updateSlotsUI();
+
+        // Artificial delay so the loading GIF plays for at least 4 seconds
+        var elapsed = Date.now() - startTime;
+        if (elapsed < 4000) {
+            await new Promise(function(resolve) { setTimeout(resolve, 4000 - elapsed); });
+        }
 
         document.getElementById('successEmail').textContent = formData.email;
         document.getElementById('successRef').textContent = bookingRef;

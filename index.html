@@ -144,11 +144,11 @@
         /* Loader */
         .btn-loader {
             display: none;
-            width: 24px; height: 24px;
-            border: 3px solid rgba(21,21,21,0.3);
-            border-top-color: #151515;
-            border-radius: 50%;
-            animation: btnSpin 0.7s linear infinite;
+            width: 40px; height: 40px;
+            background-image: url("https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/thumbnail");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -209,9 +209,15 @@
                         <div id="mobileSlotsInner"></div>
                     </div>
 
-                    <div class="input-group">
-                        <label><i data-lucide="user"></i> Name <span style="color:var(--hell-red)">*</span></label>
-                        <input type="text" id="custName" required placeholder="Enter your soul's name">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;">
+                        <div class="input-group">
+                            <label><i data-lucide="user"></i> First Name <span style="color:var(--hell-red)">*</span></label>
+                            <input type="text" id="custFirstName" required placeholder="First name">
+                        </div>
+                        <div class="input-group">
+                            <label><i data-lucide="user"></i> Last Name <span style="color:var(--hell-red)">*</span></label>
+                            <input type="text" id="custLastName" required placeholder="Last name">
+                        </div>
                     </div>
 
                     <div class="input-group">
