@@ -306,15 +306,23 @@ function updateMobileSlots() {
 }
 
 function showScreen(screenId) {
+    var delay = 0;
     elements.screens.forEach(function(s) {
-        if (s.id === screenId) {
-            s.style.display = 'block';
-            setTimeout(function() { s.classList.add('active'); }, 10);
-        } else {
+        if (s.id !== screenId && s.classList.contains('active')) {
             s.classList.remove('active');
             setTimeout(function() { s.style.display = 'none'; }, 500);
+            delay = 500;
         }
     });
+
+    setTimeout(function() {
+        elements.screens.forEach(function(s) {
+            if (s.id === screenId) {
+                s.style.display = 'block';
+                setTimeout(function() { s.classList.add('active'); }, 20);
+            }
+        });
+    }, delay);
 }
 
 function resetForm() {
@@ -382,6 +390,9 @@ async function handleFormSubmit(e) {
         setLoading(true);
         var startTime = Date.now();
 
+        // 1. Immediately show the new video loading screen
+        showScreen('loadingScreen');
+
         // Write to Supabase
         await sbFetch('bookings', {
             method: 'POST',
@@ -410,14 +421,16 @@ async function handleFormSubmit(e) {
         if (slot) slot.booked += formData.guests;
         updateSlotsUI();
 
-        // Artificial delay so the loading GIF plays for at least 4 seconds
+        document.getElementById('successEmail').textContent = formData.email;
+        document.getElementById('successRef').textContent = bookingRef;
+
+        // 2. Ensure the video loading screen shows for exactly 4 seconds
         var elapsed = Date.now() - startTime;
         if (elapsed < 4000) {
             await new Promise(function(resolve) { setTimeout(resolve, 4000 - elapsed); });
         }
 
-        document.getElementById('successEmail').textContent = formData.email;
-        document.getElementById('successRef').textContent = bookingRef;
+        // 3. Show success page
         showScreen('successPage');
 
         // Refresh counts from DB in background

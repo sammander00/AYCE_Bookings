@@ -144,11 +144,11 @@
         /* Loader */
         .btn-loader {
             display: none;
-            width: 40px; height: 40px;
-            background-image: url("https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/thumbnail");
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            width: 24px; height: 24px;
+            border: 3px solid rgba(21,21,21,0.3);
+            border-top-color: #151515;
+            border-radius: 50%;
+            animation: btnSpin 0.7s linear infinite;
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -309,6 +309,13 @@
                 </div>
 
             </form>
+        </div>
+
+        <div id="loadingScreen" class="screen">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh;">
+                <video playsinline="" webkit-playsinline="" loop="" muted="" autoplay="" data-poster="https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/thumbnail" src="https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/mp4/1080p.mp4" style="max-width: 100%; max-height: 100%; border-radius: 8px;"></video>
+                <h3 style="margin-top: 1rem; color: var(--hell-red); letter-spacing: 0.1em;">RESERVING YOUR SPOT...</h3>
+            </div>
         </div>
 
         <div id="successPage" class="screen">
