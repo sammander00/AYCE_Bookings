@@ -162,7 +162,32 @@
             .nb-date-grid{grid-template-columns:repeat(2,1fr);}
             .nb-time-grid{grid-template-columns:repeat(3,1fr);}
             .nb-guests-grid{grid-template-columns:repeat(4,1fr);}
+
+            /* Mobile booking cards */
+            .booking-row{ display:none!important; }
+            .booking-card-mobile{ display:flex!important; }
+            .slot-group-header{ flex-direction:column; align-items:flex-start; gap:.2rem; }
         }
+
+        /* Mobile booking card - hidden on desktop */
+        .booking-card-mobile{
+            display:none;
+            flex-direction:column;
+            background:rgba(225,216,183,.04);
+            border:1px solid rgba(225,216,183,.08);
+            border-left:3px solid var(--red);
+            padding:.9rem 1rem;
+            margin:.4rem 0;
+            gap:.5rem;
+        }
+        .bcm-top{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
+        .bcm-name{ font-family:var(--fh); font-size:1.3rem; letter-spacing:.05em; color:var(--bone); flex:1; }
+        .bcm-actions{ display:flex; gap:.3rem; flex-shrink:0; }
+        .bcm-data{ display:flex; gap:1.2rem; align-items:flex-end; }
+        .bcm-stat{ display:flex; flex-direction:column; align-items:center; }
+        .bcm-stat-val{ font-family:var(--fh); font-size:1.6rem; color:var(--red); line-height:1; }
+        .bcm-stat-label{ font-size:.55rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; opacity:.35; }
+        .bcm-source{ display:flex; flex-direction:column; align-items:center; gap:.2rem; }
         .print-col-headers{display:none;grid-template-columns:3fr 1fr 1fr;gap:1rem;padding:.5rem 0;margin-bottom:.3rem;border-bottom:1px solid #ccc;}
         .print-col-header{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#666;}
         .print-date-line{display:none;}
@@ -264,7 +289,32 @@
             .nb-date-grid{grid-template-columns:repeat(2,1fr);}
             .nb-time-grid{grid-template-columns:repeat(3,1fr);}
             .nb-guests-grid{grid-template-columns:repeat(4,1fr);}
+
+            /* Mobile booking cards */
+            .booking-row{ display:none!important; }
+            .booking-card-mobile{ display:flex!important; }
+            .slot-group-header{ flex-direction:column; align-items:flex-start; gap:.2rem; }
         }
+
+        /* Mobile booking card - hidden on desktop */
+        .booking-card-mobile{
+            display:none;
+            flex-direction:column;
+            background:rgba(225,216,183,.04);
+            border:1px solid rgba(225,216,183,.08);
+            border-left:3px solid var(--red);
+            padding:.9rem 1rem;
+            margin:.4rem 0;
+            gap:.5rem;
+        }
+        .bcm-top{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
+        .bcm-name{ font-family:var(--fh); font-size:1.3rem; letter-spacing:.05em; color:var(--bone); flex:1; }
+        .bcm-actions{ display:flex; gap:.3rem; flex-shrink:0; }
+        .bcm-data{ display:flex; gap:1.2rem; align-items:flex-end; }
+        .bcm-stat{ display:flex; flex-direction:column; align-items:center; }
+        .bcm-stat-val{ font-family:var(--fh); font-size:1.6rem; color:var(--red); line-height:1; }
+        .bcm-stat-label{ font-size:.55rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; opacity:.35; }
+        .bcm-source{ display:flex; flex-direction:column; align-items:center; gap:.2rem; }
 
         /* Add a PWA manifest meta for home screen install */
 
@@ -718,7 +768,7 @@ function renderSessionDetail(index){
         var guestCount=rows.reduce(function(acc,b){return acc+(parseInt(b.guests)||0);},0);
         var rowsHtml=rows.length>0
             ?rows.map(function(b){
-                return '<div class="booking-row">'
+                var desktopRow = '<div class="booking-row">'
                     +'<div class="b-name">'+esc(b.name)+'</div>'
                     +'<div class="b-data-row">'
                     +'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
@@ -729,6 +779,19 @@ function renderSessionDetail(index){
                     +'<button class="icon-btn" onclick="openEdit(&apos;'+escA(b.ref)+'&apos;)" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
                     +'<button class="icon-btn del" onclick="delBooking(&apos;'+escA(b.ref)+'&apos;)" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
                     +'</div></div>';
+                var mobileCard = '<div class="booking-card-mobile">'
+                    +'<div class="bcm-top">'
+                    +'<div class="bcm-name">'+esc(b.name)+'</div>'
+                    +'<div class="bcm-actions">'
+                    +'<button class="icon-btn" onclick="openEdit(&apos;'+escA(b.ref)+'&apos;)" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
+                    +'<button class="icon-btn del" onclick="delBooking(&apos;'+escA(b.ref)+'&apos;)" title="Delete"><i data-lucide="trash-2" size="13"></i></button>'
+                    +'</div></div>'
+                    +'<div class="bcm-data">'
+                    +'<div class="bcm-stat"><div class="bcm-stat-val">'+b.guests+'</div><div class="bcm-stat-label">guests</div></div>'
+                    +'<div class="bcm-stat"><div class="bcm-stat-val">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="bcm-stat-label">vegs</div></div>'
+                    +'<div class="bcm-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="bcm-stat-label">source</div></div>'
+                    +'</div></div>';
+                return desktopRow + mobileCard;
             }).join('')
             :'<div class="empty-slot">No bookings yet</div>';
         return '<div class="slot-group">'
