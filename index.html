@@ -253,10 +253,10 @@
 
                     <!-- Vegetarian question under map -->
                     <div class="input-group" style="margin-top:1.8rem;">
-                        <label><i data-lucide="leaf"></i> Any vegetarians in your group?</label>
+                        <label><i data-lucide="leaf"></i> Any vegetarians in your group? <span style="color:var(--hell-red)">*</span></label>
                         <div style="display:flex; gap:0.8rem; margin-bottom:1rem;">
                             <button type="button" id="vegYes" class="veg-btn" onclick="setVeg(true)">YES</button>
-                            <button type="button" id="vegNo"  class="veg-btn active" onclick="setVeg(false)">NO</button>
+                            <button type="button" id="vegNo"  class="veg-btn" onclick="setVeg(false)">NO</button>
                         </div>
                         <div id="vegCountWrap" style="display:none;">
                             <label style="font-size:0.8rem; opacity:0.6; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.6rem; display:block;">How many vegetarians?</label>
@@ -276,7 +276,7 @@
                     </ul>
                     <label class="terms-accept">
                         <input type="checkbox" id="termsAccepted" required>
-                        <span>I have read and agree to the terms &amp; conditions above.</span>
+                        <span>I have read and agree to the terms &amp; conditions above. <span style="color:var(--hell-red)">*</span></span>
                     </label>
                 </div>
 

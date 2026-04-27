@@ -136,16 +136,7 @@ function initDatePicker() {
         if (i === 0) { firstBtn = btn; firstDateStr = dateStr; }
     }
 
-    if (firstBtn) {
-        firstBtn.classList.add('active');
-        appState.selectedDate = firstDateStr;
-        elements.sessionDate.value = firstDateStr;
-        fetchAvailability(firstDateStr);
-        // Pre-fetch other dates in background so switching is fast
-        setTimeout(function() {
-            appState.allDates.slice(1).forEach(function(d) { fetchAvailability(d); });
-        }, 500);
-    }
+    // No date auto-selected — user must tap a date to load availability
 }
 // Pre-warm controls cache immediately so first fetchAvailability skips it
 sbFetch('controls?id=eq.1').then(function(ctrlRows) {
