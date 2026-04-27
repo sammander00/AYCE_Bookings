@@ -144,6 +144,12 @@ body {
     }
 }
 
+@media (max-width: 850px) {
+    .form-slots > label {
+        display: none !important;
+    }
+}
+
 input[type="text"], 
 input[type="tel"],
 input[type="email"],
