@@ -8,6 +8,7 @@ let appState = {
     numGuests: 1,
     selectedTime: null,
     selectedDate: null,
+    controlsCache: null,
     slots: [
         { time: '5:30', booked: 0, capacity: 30, forcedSoldOut: false },
         { time: '6:00', booked: 0, capacity: 30, forcedSoldOut: false },
@@ -47,11 +48,13 @@ async function sbFetch(path, options) {
 
 /* ── FETCH AVAILABILITY (fast — direct DB query) ── */
 async function fetchAvailability(date) {
-    // Parallel: get bookings + controls at the same time
-    var [rows, ctrlRows] = await Promise.all([
-        sbFetch('bookings?select=time,guests&date=eq.' + encodeURIComponent(date)),
-        sbFetch('controls?id=eq.1')
-    ]);
+    // If controls not cached yet, fetch both in parallel; otherwise just bookings
+    var fetchList = [sbFetch('bookings?select=time,guests&date=eq.' + encodeURIComponent(date))];
+    if (!appState.controlsCache) fetchList.push(sbFetch('controls?id=eq.1'));
+
+    var results = await Promise.all(fetchList);
+    var rows = results[0];
+    if (results[1]) appState.controlsCache = (results[1].length > 0) ? results[1][0].data : {};
 
     var counts = {};
     SLOTS.forEach(function(s) { counts[s] = 0; });
@@ -59,7 +62,7 @@ async function fetchAvailability(date) {
         if (counts[r.time] !== undefined) counts[r.time] += (parseInt(r.guests) || 0);
     });
 
-    var ctrl = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
+    var ctrl = appState.controlsCache || {};
     var dateCtrl = ctrl[date] || { blocked: false, stoppedSlots: [] };
 
     appState.slots.forEach(function(slot) {
@@ -144,6 +147,10 @@ function initDatePicker() {
         }, 500);
     }
 }
+// Pre-warm controls cache immediately so first fetchAvailability skips it
+sbFetch('controls?id=eq.1').then(function(ctrlRows) {
+    appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
+}).catch(function(){});
 initDatePicker();
 
 // Auto-refresh every 30s
@@ -282,7 +289,11 @@ function resetForm() {
     updateGuestUI();
     updateSlotsUI();
     showScreen('bookingPage');
-    initDatePicker();
+    // Pre-warm controls cache immediately so first fetchAvailability skips it
+sbFetch('controls?id=eq.1').then(function(ctrlRows) {
+    appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
+}).catch(function(){});
+initDatePicker();
 }
 
 /* ── SUBMIT ── */
