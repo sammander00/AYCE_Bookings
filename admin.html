@@ -723,7 +723,7 @@ function renderSessionDetail(index){
                     +'<div class="b-data-row">'
                     +'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
                     +'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
-                    +'<div class="b-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="source-badge-label">source</div></div>'
+                    +'<div class="b-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="b-guests-label">source</div></div>'
                     +'</div>'
                     +'<div class="b-actions">'
                     +'<button class="icon-btn" onclick="openEdit(&apos;'+escA(b.ref)+'&apos;)" title="Edit"><i data-lucide="pencil" size="13"></i></button>'
