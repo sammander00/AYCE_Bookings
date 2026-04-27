@@ -209,7 +209,7 @@
                         <div id="mobileSlotsInner"></div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;">
+                    <div class="name-grid">
                         <div class="input-group">
                             <label><i data-lucide="user"></i> First Name <span style="color:var(--hell-red)">*</span></label>
                             <input type="text" id="custFirstName" required placeholder="First name">
@@ -311,24 +311,6 @@
             </form>
         </div>
 
-        <div id="loadingScreen" class="screen">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center;">
-                <div style="position: relative; width: 100%; max-width: 600px; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
-                    <video playsinline webkit-playsinline loop muted autoplay 
-                        poster="https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/thumbnail" 
-                        src="https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/mp4/1080p.mp4" 
-                        style="width: 100%; height: 100%; object-fit: cover;"
-                        onerror="this.style.display='none'; document.getElementById('videoFallback').style.display='flex';">
-                    </video>
-                    <div id="videoFallback" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: url('https://video.squarespace-cdn.com/content/v1/5e7a6349e4ce762924ffdefa/15ae8a89-b7c4-49ad-a8ae-6cfa6c74b77f/thumbnail') center/cover no-repeat;">
-                        <div class="loader-spinner" style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: btnSpin 1s linear infinite;"></div>
-                    </div>
-                </div>
-                <h2 class="display-text glow-red" style="margin-top: 2rem; font-size: 1.8rem;">RESERVING YOUR SPOT...</h2>
-                <p style="opacity: 0.6; font-style: italic; margin-top: 0.5rem;">Preparing your ticket to HELL</p>
-            </div>
-        </div>
-
         <div id="successPage" class="screen">
             <div class="success-message">
                 <i data-lucide="check-circle" class="success-icon"></i>
@@ -345,7 +327,7 @@
         <a href="https://order.hellpizza.nz" target="_blank">ORDER.HELLPIZZA.NZ</a>
     </footer>
 
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
     <script>
         // ── Leaflet interactive map ──
         var map = L.map('hellMap', {

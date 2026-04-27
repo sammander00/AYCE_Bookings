@@ -307,6 +307,7 @@ function updateMobileSlots() {
 
 function showScreen(screenId) {
     // 1. Immediately hide ALL screens to prevent overlapping
+    // Using inline style and !important-like effect by ensuring display: none is set
     elements.screens.forEach(function(s) {
         s.classList.remove('active');
         s.style.display = 'none';
@@ -316,16 +317,10 @@ function showScreen(screenId) {
     var target = document.getElementById(screenId);
     if (target) {
         target.style.display = 'block';
-        // Trigger reflow for transition
+        // Force a layout reflow for the transition to work smoothly
         void target.offsetWidth;
         target.classList.add('active');
-        
-        // If it's a video screen, try to play the video
-        var video = target.querySelector('video');
-        if (video) {
-            video.currentTime = 0;
-            video.play().catch(function() {});
-        }
+        window.scrollTo(0, 0); // Always jump to top on screen change
     }
 }
 
@@ -392,10 +387,6 @@ async function handleFormSubmit(e) {
 
     try {
         setLoading(true);
-        var startTime = Date.now();
-
-        // 1. Immediately show the new video loading screen
-        showScreen('loadingScreen');
 
         // Write to Supabase
         await sbFetch('bookings', {
@@ -427,12 +418,6 @@ async function handleFormSubmit(e) {
 
         document.getElementById('successEmail').textContent = formData.email;
         document.getElementById('successRef').textContent = bookingRef;
-
-        // 2. Ensure the video loading screen shows for exactly 4 seconds
-        var elapsed = Date.now() - startTime;
-        if (elapsed < 4000) {
-            await new Promise(function(resolve) { setTimeout(resolve, 4000 - elapsed); });
-        }
 
         // 3. Show success page
         showScreen('successPage');
