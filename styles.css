@@ -534,6 +534,7 @@ tr:hover td {
 }
 
 @media (max-width: 768px) {
+    .desktop-only-prompt { display: none !important; }
     .logo-text {
         font-size: 5rem;
     }
