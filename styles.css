@@ -332,13 +332,14 @@ input:focus {
 @media (max-width: 850px) {
     .desktop-only-prompt { display: none !important; }
     .booking-grid {
-        grid-template-columns: 1fr;
         display: flex;
         flex-direction: column;
     }
     .form-date-block { order: 1; }
     .form-slots { order: 2; }
     .form-fields-block { order: 3; }
+    .form-footer { order: 4; width: 100%; }
+    .form-main { order: 1; }
 }
 
 .submit-btn {
