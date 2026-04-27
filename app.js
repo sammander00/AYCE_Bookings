@@ -306,22 +306,22 @@ function updateMobileSlots() {
 }
 
 function showScreen(screenId) {
-    // 1. Immediately hide ALL screens to prevent overlapping
-    // Using inline style and !important-like effect by ensuring display: none is set
-    elements.screens.forEach(function(s) {
-        s.classList.remove('active');
-        s.style.display = 'none';
-    });
+    // 1. Get all screens directly from DOM to be safe
+    var allScreens = document.querySelectorAll('.screen');
+    
+    // 2. Remove 'active' from everything
+    for (var i = 0; i < allScreens.length; i++) {
+        allScreens[i].classList.remove('active');
+    }
 
-    // 2. Show the target screen
+    // 3. Add 'active' ONLY to the target
     var target = document.getElementById(screenId);
     if (target) {
-        target.style.display = 'block';
-        // Force a layout reflow for the transition to work smoothly
-        void target.offsetWidth;
         target.classList.add('active');
-        window.scrollTo(0, 0); // Always jump to top on screen change
     }
+    
+    // 4. Force jump to top
+    window.scrollTo(0, 0);
 }
 
 function resetForm() {

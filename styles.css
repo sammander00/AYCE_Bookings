@@ -392,13 +392,13 @@ input:focus {
 
 /* Screen Transitions */
 .screen {
-    display: none;
+    display: none !important;
     opacity: 0;
     transition: opacity 0.5s ease;
 }
 
 .screen.active {
-    display: block;
+    display: block !important;
     opacity: 1;
 }
 
