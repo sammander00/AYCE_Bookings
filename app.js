@@ -133,10 +133,13 @@ function initDatePicker() {
                 if (prompt) prompt.style.display = 'none';
                 if (slots) slots.style.display = '';
                 // Show mobile slots, hide mobile prompt
+                // Show mobile slots wrapper
+                var mobileWrapper = document.querySelector('.mobile-slots');
+                if (mobileWrapper) mobileWrapper.style.display = 'block';
                 var promptM = document.getElementById('selectDatePromptMobile');
                 var slotsM = document.getElementById('slotsContainerMobile');
                 if (promptM) promptM.style.display = 'none';
-                if (slotsM) { slotsM.style.display = ''; slotsM.style.removeProperty('display'); slotsM.style.display = 'grid'; }
+                if (slotsM) slotsM.style.display = 'grid';
                 updateSlotsUI();
                 fetchAvailability(ds);
 
