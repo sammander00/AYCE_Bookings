@@ -337,6 +337,10 @@ input:focus {
     .form-slots { display: none !important; }
 }
 
+@media (min-width: 851px) {
+    #mobileSlots { display: none !important; }
+}
+
 .submit-btn {
     width: 100%;
     padding: 1.5rem;
