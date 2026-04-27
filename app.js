@@ -1,8 +1,9 @@
 /* ── SUPABASE CONFIG ── */
 const SUPABASE_URL = 'https://zmhfympqxvdkotyjzvuk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_I5WfIE7qy58qjLz6TsvqVw_ZI60hNDW';
-const CAPACITY     = 30;
-const SLOTS        = ['5:30', '6:00', '6:30'];
+const SESSION_CAPACITY = 100;
+const SLOT_SOFT_CAP    = 35;
+const SLOTS            = ['5:30', '6:00', '6:30'];
 
 let appState = {
     numGuests: 1,
@@ -244,23 +245,33 @@ function updateGuestUI() {
 }
 
 function updateSlotsUI() {
+    var totalSessionBooked = appState.slots.reduce(function(sum, s) { return sum + s.booked; }, 0);
+    var remainingSession = Math.max(0, SESSION_CAPACITY - totalSessionBooked);
+
     elements.slotBtns.forEach(function(btn) {
         var time = btn.dataset.time;
         var slot = appState.slots.find(function(s) { return s.time === time; });
-        var remaining = slot ? (slot.capacity - slot.booked) : 30;
         var availText = btn.querySelector('.availability');
 
-        if (!slot || remaining <= 0 || slot.forcedSoldOut) {
+        var isSoldOut = false;
+        if (!slot || slot.forcedSoldOut || slot.booked >= SLOT_SOFT_CAP || appState.numGuests > remainingSession) {
+            isSoldOut = true;
+        }
+
+        if (isSoldOut) {
             btn.classList.add('disabled');
-            btn.classList.remove('active', 'urgent');
+            btn.classList.remove('active', 'almost-full');
             availText.textContent = 'SOLD OUT';
         } else {
             btn.classList.remove('disabled');
-            availText.textContent = remaining + ' SEATS LEFT';
-            btn.classList.toggle('urgent', remaining <= 10);
-            if (remaining < appState.numGuests) {
-                btn.classList.add('disabled');
-                availText.textContent = 'NEED ' + appState.numGuests + ' SEATS';
+            var remainingInSlotCap = Math.max(0, SLOT_SOFT_CAP - slot.booked);
+            
+            if (remainingInSlotCap < 16) {
+                availText.textContent = 'ALMOST FULL';
+                btn.classList.add('almost-full');
+            } else {
+                availText.textContent = 'AVAILABLE';
+                btn.classList.remove('almost-full');
             }
         }
         btn.classList.toggle('active', appState.selectedTime === time);
