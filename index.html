@@ -201,6 +201,14 @@
                         <div id="dateError" class="error-msg">PLEASE SELECT A TUESDAY SESSION.</div>
                     </div>
 
+                    <!-- Mobile only: slots shown here after date picker -->
+                    <div id="mobileSlots" style="display:none;margin-bottom:1.5rem;">
+                        <label class="input-group-label" style="display:flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:1rem;">
+                            <i data-lucide="clock" style="width:16px;height:16px;"></i> Choose Arrival Time <span style="color:var(--hell-red)">*</span>
+                        </label>
+                        <div id="mobileSlotsInner"></div>
+                    </div>
+
                     <div class="input-group">
                         <label><i data-lucide="user"></i> Name <span style="color:var(--hell-red)">*</span></label>
                         <input type="text" id="custName" required placeholder="Enter your soul's name">

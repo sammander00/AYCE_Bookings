@@ -150,6 +150,9 @@ function initDatePicker() {
 sbFetch('controls?id=eq.1').then(function(ctrlRows) {
     appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
 }).catch(function(){});
+sbFetch('controls?id=eq.1').then(function(ctrlRows) {
+    appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
+}).catch(function(){});
 initDatePicker();
 
 // Auto-refresh every 30s
@@ -263,6 +266,7 @@ function updateSlotsUI() {
         btn.classList.toggle('active', appState.selectedTime === time);
     });
     document.getElementById('selectedTime').value = appState.selectedTime || '';
+    updateMobileSlots();
 }
 
 function showScreen(screenId) {
