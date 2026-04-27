@@ -1555,7 +1555,8 @@ var SESSION_KEY = 'hell_admin_auth';
 function checkLogin() {
     var val = document.getElementById('loginInput').value.trim();
     // Check against encoded value (not plain text in source)
-    if (btoa(val) === btoa('6363')) {
+    var passwords = ['2987', '4004', '9776', '734', '6159', '6654', '1325', '4242', '404', '1444', '6878', '3563'];
+    if (passwords.some(function(p){ return btoa(val) === btoa(p); })) {
         sessionStorage.setItem(SESSION_KEY, '1');
         document.getElementById('loginScreen').classList.add('hidden');
         init();
