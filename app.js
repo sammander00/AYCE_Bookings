@@ -306,23 +306,27 @@ function updateMobileSlots() {
 }
 
 function showScreen(screenId) {
-    var delay = 0;
+    // 1. Immediately hide ALL screens to prevent overlapping
     elements.screens.forEach(function(s) {
-        if (s.id !== screenId && s.classList.contains('active')) {
-            s.classList.remove('active');
-            setTimeout(function() { s.style.display = 'none'; }, 500);
-            delay = 500;
-        }
+        s.classList.remove('active');
+        s.style.display = 'none';
     });
 
-    setTimeout(function() {
-        elements.screens.forEach(function(s) {
-            if (s.id === screenId) {
-                s.style.display = 'block';
-                setTimeout(function() { s.classList.add('active'); }, 20);
-            }
-        });
-    }, delay);
+    // 2. Show the target screen
+    var target = document.getElementById(screenId);
+    if (target) {
+        target.style.display = 'block';
+        // Trigger reflow for transition
+        void target.offsetWidth;
+        target.classList.add('active');
+        
+        // If it's a video screen, try to play the video
+        var video = target.querySelector('video');
+        if (video) {
+            video.currentTime = 0;
+            video.play().catch(function() {});
+        }
+    }
 }
 
 function resetForm() {
