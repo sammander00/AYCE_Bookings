@@ -266,6 +266,7 @@ function updateSlotsUI() {
         btn.classList.toggle('active', appState.selectedTime === time);
     });
     document.getElementById('selectedTime').value = appState.selectedTime || '';
+    updateMobileSlots();
 }
 
 function showScreen(screenId) {
