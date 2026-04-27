@@ -269,6 +269,31 @@ function updateSlotsUI() {
     updateMobileSlots();
 }
 
+function updateMobileSlots() {
+    var mobileInner = document.getElementById('mobileSlotsInner');
+    var mobileContainer = document.getElementById('mobileSlots');
+    var desktopSlots = document.getElementById('slotsContainer');
+    
+    if (!mobileInner || !mobileContainer || !desktopSlots) return;
+    
+    if (desktopSlots.style.display !== 'none') {
+        mobileContainer.style.display = 'block';
+        mobileInner.className = 'slots-container';
+        mobileInner.innerHTML = desktopSlots.innerHTML;
+        
+        mobileInner.querySelectorAll('.slot-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                if (e.currentTarget.classList.contains('disabled')) return;
+                appState.selectedTime = e.currentTarget.dataset.time;
+                updateSlotsUI();
+            });
+        });
+    } else {
+        mobileContainer.style.display = 'none';
+        mobileInner.innerHTML = '';
+    }
+}
+
 function showScreen(screenId) {
     elements.screens.forEach(function(s) {
         if (s.id === screenId) {
