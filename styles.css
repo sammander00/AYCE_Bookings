@@ -330,6 +330,7 @@ input:focus {
 
 /* Form Footer moved to booking-grid for responsiveness */
 @media (max-width: 850px) {
+    .desktop-only-prompt { display: none !important; }
     .booking-grid {
         grid-template-columns: 1fr;
     }
@@ -534,7 +535,6 @@ tr:hover td {
 }
 
 @media (max-width: 768px) {
-    .desktop-only-prompt { display: none !important; }
     .logo-text {
         font-size: 5rem;
     }
