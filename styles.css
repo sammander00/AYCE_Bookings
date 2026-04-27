@@ -333,7 +333,12 @@ input:focus {
     .desktop-only-prompt { display: none !important; }
     .booking-grid {
         grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
     }
+    .form-date-block { order: 1; }
+    .form-slots { order: 2; }
+    .form-fields-block { order: 3; }
 }
 
 .submit-btn {

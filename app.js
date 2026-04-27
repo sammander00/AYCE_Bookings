@@ -134,13 +134,7 @@ function initDatePicker() {
                 if (slots) slots.style.display = '';
                 updateSlotsUI();
                 fetchAvailability(ds);
-                // On mobile, scroll time slots into view
-                if (window.innerWidth <= 850) {
-                    setTimeout(function() {
-                        var slotsSection = document.querySelector('.form-slots');
-                        if (slotsSection) slotsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
+
             };
         })(dateStr);
 
