@@ -469,7 +469,7 @@
             <div class="session-title"><h2 id="sessionTitle">TUESDAY</h2><p id="sessionSubtitle">LOADING...</p></div>
             <div class="session-actions">
                 <span id="lastSynced" style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.35;align-self:center;"></span>
-                <button class="btn-outline" onclick="window.print()"><i data-lucide="printer" size="14"></i>PRINT</button>
+                <button class="btn-outline" onclick="printBookingsList()"><i data-lucide="printer" size="14"></i>PRINT</button>
                     <button class="btn-outline" onclick="printPlaceholders()"><i data-lucide="layout-template" size="14"></i>PLACEHOLDERS</button>
             </div>
         </div>
@@ -1384,6 +1384,102 @@ function printPlaceholders() {
             document.body.classList.remove('print-placeholders');
         }, 1000);
     }, 100);
+}
+
+
+// -- PRINT BOOKINGS LIST --
+function printBookingsList() {
+    var i = currentIdx();
+    if (i < 0) return;
+    var session = state.sessions[i];
+    if (!session || !session.loaded) return;
+
+    var totalBookings = session.bookings.length;
+
+    // Scale font size based on booking count
+    // 1-10 bookings: 18pt, 11-20: 16pt, 21-35: 14pt, 36-50: 12pt, 51+: 10pt
+    var fontSize = 18;
+    if (totalBookings > 50) fontSize = 10;
+    else if (totalBookings > 35) fontSize = 12;
+    else if (totalBookings > 20) fontSize = 14;
+    else if (totalBookings > 10) fontSize = 16;
+
+    var rowHeight = fontSize * 2.2;
+    var headerHtml = '<div class="ph">'
+        + '<div class="ph-head">'
+        + '<div class="ph-title">HELL PIZZA &mdash; ALL YOU CAN EAT TUESDAY</div>'
+        + '<div class="ph-date">' + session.label + '</div>'
+        + '</div>';
+
+    var SLOT_LABELS = { '5:30': '5:30 PM', '6:00': '6:00 PM', '6:30': '6:30 PM' };
+    var slots = ['5:30', '6:00', '6:30'];
+
+    var bodyHtml = '';
+    slots.forEach(function(time) {
+        var rows = session.bookings.filter(function(b) { return b.time === time; })
+            .sort(function(a, b) { return a.name.localeCompare(b.name); });
+        if (!rows.length) return;
+
+        var slotTotal = rows.reduce(function(acc, b) { return acc + (parseInt(b.guests) || 0); }, 0);
+
+        bodyHtml += '<div class="slot-block">'
+            + '<div class="slot-header">'
+            + '<span class="slot-time">' + SLOT_LABELS[time] + '</span>'
+            + '<span class="slot-meta">' + slotTotal + ' people &bull; ' + rows.length + ' booking' + (rows.length !== 1 ? 's' : '') + '</span>'
+            + '</div>'
+            + '<table class="bookings-table">'
+            + '<thead><tr>'
+            + '<th class="col-name">NAME</th>'
+            + '<th class="col-guests">GUESTS</th>'
+            + '<th class="col-vegs">VEGS</th>'
+            + '</tr></thead>'
+            + '<tbody>'
+            + rows.map(function(b) {
+                return '<tr>'
+                    + '<td class="col-name">' + esc(b.name) + '</td>'
+                    + '<td class="col-guests">' + b.guests + '</td>'
+                    + '<td class="col-vegs">' + (b.vegetarians > 0 ? b.vegetarians : '--') + '</td>'
+                    + '</tr>';
+            }).join('')
+            + '</tbody></table></div>';
+    });
+
+    bodyHtml += '</div>';
+
+    var html = '<!DOCTYPE html><html><head>'
+        + '<meta charset="UTF-8">'
+        + '<title>Bookings -- ' + session.label + '</title>'
+        + '<style>'
+        + '* { margin:0; padding:0; box-sizing:border-box; }'
+        + 'body { font-family: Arial, Helvetica, sans-serif; background: white; color: #111; font-size: ' + fontSize + 'pt; }'
+        + '.ph { padding: 12mm 14mm; }'
+        + '.ph-head { border-bottom: 3px solid #111; padding-bottom: 5mm; margin-bottom: 7mm; display:flex; justify-content:space-between; align-items:flex-end; }'
+        + '.ph-title { font-size: ' + Math.round(fontSize * 0.85) + 'pt; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: #C80613; }'
+        + '.ph-date { font-size: ' + Math.round(fontSize * 1.4) + 'pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }'
+        + '.slot-block { margin-bottom: 8mm; page-break-inside: avoid; }'
+        + '.slot-header { display:flex; justify-content:space-between; align-items:baseline; border-bottom: 1.5px solid #111; padding-bottom: 2mm; margin-bottom: 2mm; }'
+        + '.slot-time { font-size: ' + Math.round(fontSize * 1.1) + 'pt; font-weight: 900; text-transform: uppercase; }'
+        + '.slot-meta { font-size: ' + Math.round(fontSize * 0.7) + 'pt; color: #C80613; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }'
+        + '.bookings-table { width: 100%; border-collapse: collapse; }'
+        + '.bookings-table thead th { font-size: ' + Math.round(fontSize * 0.65) + 'pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 1.5mm 0; border-bottom: 1px solid #ddd; text-align: left; }'
+        + '.bookings-table thead th.col-guests, .bookings-table thead th.col-vegs { text-align: center; }'
+        + '.bookings-table tbody tr { border-bottom: 1px solid #eee; }'
+        + '.bookings-table tbody tr:last-child { border-bottom: none; }'
+        + '.bookings-table td { padding: ' + Math.round(rowHeight * 0.18) + 'px 0; vertical-align: middle; }'
+        + '.col-name { width: 70%; font-weight: 700; }'
+        + '.col-guests { width: 15%; text-align: center; font-weight: 700; color: #C80613; font-size: ' + Math.round(fontSize * 1.1) + 'pt; }'
+        + '.col-vegs { width: 15%; text-align: center; font-weight: 700; color: #C80613; font-size: ' + Math.round(fontSize * 1.1) + 'pt; }'
+        + '@page { size: A4; margin: 0; }'
+        + '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }'
+        + '</style>'
+        + '</head><body>'
+        + headerHtml + bodyHtml
+        + '<script>window.onload = function(){ window.print(); }<\/script>'
+        + '</body></html>';
+
+    var win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
 }
 
 // -- LOGIN --
