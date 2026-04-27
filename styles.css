@@ -95,21 +95,9 @@ body {
 
 /* Booking Form Grid */
 .booking-grid {
-    display: block;
-}
-.form-main {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    align-items: start;
-}
-.form-main > .input-group,
-.form-main > .call-store-msg {
-    grid-column: 1;
-}
-.form-main > .form-slots {
-    grid-column: 2;
-    grid-row: 1 / 99;
 }
 
 .form-footer {
@@ -343,14 +331,10 @@ input:focus {
 /* Form Footer moved to booking-grid for responsiveness */
 @media (max-width: 850px) {
     .desktop-only-prompt { display: none !important; }
-    .form-main {
-        display: flex;
-        flex-direction: column;
+    .booking-grid {
+        grid-template-columns: 1fr;
     }
-    .form-main > .form-slots {
-        order: -1;
-        margin-bottom: 1.5rem;
-    }
+    .form-slots { display: none !important; }
 }
 
 .submit-btn {
