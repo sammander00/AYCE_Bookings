@@ -1398,13 +1398,12 @@ function printBookingsList() {
 
     // Scale font size based on booking count
     // 1-10 bookings: 18pt, 11-20: 16pt, 21-35: 14pt, 36-50: 12pt, 51+: 10pt
-    var fontSize = 18;
-    if (totalBookings > 50) fontSize = 10;
-    else if (totalBookings > 35) fontSize = 12;
-    else if (totalBookings > 20) fontSize = 14;
-    else if (totalBookings > 10) fontSize = 16;
+    var fontSize = 13;
+    if (totalBookings > 50) fontSize = 8;
+    else if (totalBookings > 35) fontSize = 9;
+    else if (totalBookings > 20) fontSize = 10;
+    else if (totalBookings > 10) fontSize = 11;
 
-    var rowHeight = fontSize * 2.2;
     var headerHtml = '<div class="ph">'
         + '<div class="ph-head">'
         + '<div class="ph-title">HELL PIZZA &mdash; ALL YOU CAN EAT TUESDAY</div>'
@@ -1452,25 +1451,25 @@ function printBookingsList() {
         + '<style>'
         + '* { margin:0; padding:0; box-sizing:border-box; }'
         + 'body { font-family: Arial, Helvetica, sans-serif; background: white; color: #111; font-size: ' + fontSize + 'pt; }'
-        + '.ph { padding: 12mm 14mm; }'
-        + '.ph-head { border-bottom: 3px solid #111; padding-bottom: 5mm; margin-bottom: 7mm; display:flex; justify-content:space-between; align-items:flex-end; }'
+        + '.ph { padding: 8mm 10mm; }'
+        + '.ph-head { border-bottom: 3px solid #111; padding-bottom: 3mm; margin-bottom: 5mm; display:flex; justify-content:space-between; align-items:center; }'
         + '.ph-title { font-size: ' + Math.round(fontSize * 0.85) + 'pt; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: #C80613; }'
         + '.ph-date { font-size: ' + Math.round(fontSize * 0.85) + 'pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }'
-        + '.slot-block { margin-bottom: 8mm; page-break-inside: avoid; }'
-        + '.slot-header { display:flex; justify-content:space-between; align-items:baseline; border-bottom: 1.5px solid #111; padding-bottom: 2mm; margin-bottom: 2mm; }'
-        + '.slot-time { font-size: ' + Math.round(fontSize * 1.1) + 'pt; font-weight: 900; text-transform: uppercase; }'
-        + '.slot-meta { font-size: ' + Math.round(fontSize * 0.7) + 'pt; color: #C80613; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }'
+        + '.slot-block { margin-bottom: 4mm; page-break-inside: avoid; break-inside: avoid; }'
+        + '.slot-header { display:flex; justify-content:space-between; align-items:baseline; border-bottom: 1.5px solid #111; padding-bottom: 1mm; margin-bottom: 1mm; }'
+        + '.slot-time { font-size: ' + Math.round(fontSize * 1.0) + 'pt; font-weight: 900; text-transform: uppercase; }'
+        + '.slot-meta { font-size: ' + Math.round(fontSize * 0.65) + 'pt; color: #C80613; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }'
         + '.bookings-table { width: 100%; border-collapse: collapse; }'
-        + '.bookings-table thead th { font-size: ' + Math.round(fontSize * 0.65) + 'pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 1.5mm 0; border-bottom: 1px solid #ddd; text-align: left; }'
+        + '.bookings-table thead th { font-size: ' + Math.round(fontSize * 0.6) + 'pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 1mm 0; border-bottom: 1px solid #ddd; text-align: left; }'
         + '.bookings-table thead th.col-guests, .bookings-table thead th.col-vegs { text-align: center; }'
         + '.bookings-table tbody tr { border-bottom: 1px solid #eee; }'
         + '.bookings-table tbody tr:last-child { border-bottom: none; }'
-        + '.bookings-table td { padding: ' + Math.round(rowHeight * 0.18) + 'px 0; vertical-align: middle; }'
+        + '.bookings-table td { padding: 1.5mm 0; vertical-align: middle; }'
         + '.col-name { width: 70%; font-weight: 700; }'
-        + '.col-guests { width: 15%; text-align: center; font-weight: 700; color: #C80613; font-size: ' + Math.round(fontSize * 1.1) + 'pt; }'
-        + '.col-vegs { width: 15%; text-align: center; font-weight: 700; color: #C80613; font-size: ' + Math.round(fontSize * 1.1) + 'pt; }'
-        + '@page { margin: 10mm; }'
-        + '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }'
+        + '.col-guests { width: 15%; text-align: center; font-weight: 700; color: #C80613; font-size: ' + Math.round(fontSize * 1.0) + 'pt; }'
+        + '.col-vegs { width: 15%; text-align: center; font-weight: 700; color: #C80613; font-size: ' + Math.round(fontSize * 1.0) + 'pt; }'
+        + '@page { margin: 12mm 10mm; }'
+        + '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .slot-block { page-break-inside: avoid; break-inside: avoid; } }'
         + '</style>'
         + '</head><body>'
         + headerHtml + bodyHtml
