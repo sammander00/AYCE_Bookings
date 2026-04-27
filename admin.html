@@ -113,6 +113,15 @@
         .b-actions{display:flex;gap:.35rem;justify-content:flex-end;}
         .b-source{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
         .b-data-row{display:contents;}
+        .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:1.5rem;}
+        .modal-backdrop.open{display:flex;}
+        .modal-box{background:#1a1a1a;border:1px solid rgba(225,216,183,.1);padding:2rem;width:100%;max-width:900px;max-height:90vh;overflow-y:auto;}
+        .modal-title{font-family:var(--fh);font-size:1.8rem;letter-spacing:.05em;margin:0 0 1.5rem;}
+        .modal-field{margin-bottom:1.2rem;}
+        .modal-field label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;opacity:.45;margin-bottom:.5rem;}
+        .modal-field input,.modal-field select{width:100%;background:#111;border:1px solid rgba(225,216,183,.15);color:var(--bone);padding:.75rem 1rem;font-size:.95rem;font-family:var(--fb);box-sizing:border-box;}
+        .modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--red);}
+        .modal-btns{display:flex;gap:.8rem;margin-top:1.8rem;}
         @media(max-width:600px){
             .wrap{margin:0;padding:.8rem;border-radius:0;border-left:none;border-right:none;min-height:100vh;}
             .topbar{padding-bottom:.8rem;margin-bottom:1.2rem;}
@@ -712,8 +721,8 @@ function renderSessionDetail(index){
                 return '<div class="booking-row">'
                     +'<div class="b-name">'+esc(b.name)+'</div>'
                     +'<div class="b-data-row">'
-                    +'<div style="display:flex;flex-direction:column;align-items:center;width:70px;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
-                    +'<div style="display:flex;flex-direction:column;align-items:center;width:70px;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
+                    +'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;"><div class="b-guests">'+b.guests+'</div><div class="b-guests-label">guests</div></div>'
+                    +'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;"><div class="b-vegs">'+(b.vegetarians>0?b.vegetarians:'--')+'</div><div class="b-guests-label">vegs</div></div>'
                     +'<div class="b-source"><div class="source-icon">'+(b.source==='staff'?phoneSvg:globeSvg)+'</div><div class="source-badge-label">source</div></div>'
                     +'</div>'
                     +'<div class="b-actions">'
