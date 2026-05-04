@@ -50,7 +50,7 @@ async function sbFetch(path, options) {
 /* ── FETCH AVAILABILITY (fast — direct DB query) ── */
 async function fetchAvailability(date) {
     // If controls not cached yet, fetch both in parallel; otherwise just bookings
-    var fetchList = [sbFetch('bookings?select=time,guests&date=eq.' + encodeURIComponent(date))];
+    sbFetch('booking_availability?select=time,guests&date=eq.' + encodeURIComponent(date))
     if (!appState.controlsCache) fetchList.push(sbFetch('controls?id=eq.1'));
 
     var results = await Promise.all(fetchList);
