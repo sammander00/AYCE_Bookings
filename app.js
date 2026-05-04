@@ -344,6 +344,12 @@ initDatePicker();
 
 /* ── SUBMIT ── */
 async function handleFormSubmit(e) {
+    // Honeypot -- bots fill hidden fields, real users never see it
+    if (document.getElementById('honeypot') && document.getElementById('honeypot').value !== '') {
+        e.preventDefault();
+        showScreen('successScreen');
+        return;
+    }
     e.preventDefault();
 
     if (!appState.selectedDate) {
