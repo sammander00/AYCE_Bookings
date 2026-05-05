@@ -46,24 +46,24 @@ async function sbFetch(path, options) {
     return text ? JSON.parse(text) : null;
 }
 
-/* ── FETCH AVAILABILITY (fast — direct DB query) ── */
+/* ── FETCH AVAILABILITY ── */
 async function fetchAvailability(date) {
-    // If controls not cached yet, fetch both in parallel; otherwise just bookings
-    sbFetch('booking_availability?select=time,guests&date=eq.' + encodeURIComponent(date))
-    if (!appState.controlsCache) fetchList.push(sbFetch('controls?id=eq.1'));
+    // Always fetch both fresh so blocked dates/slots reflect immediately
+    var results = await Promise.all([
+        sbFetch('booking_availability?select=time,guests&date=eq.' + encodeURIComponent(date)),
+        sbFetch('controls?id=eq.1')
+    ]);
 
-    var results = await Promise.all(fetchList);
-    var rows = results[0];
-    if (results[1]) appState.controlsCache = (results[1].length > 0) ? results[1][0].data : {};
+    var rows = results[0] || [];
+    var ctrlRows = results[1] || [];
+    var ctrl = (ctrlRows.length > 0) ? ctrlRows[0].data : {};
+    var dateCtrl = ctrl[date] || { blocked: false, stoppedSlots: [] };
 
     var counts = {};
     SLOTS.forEach(function(s) { counts[s] = 0; });
-    (rows || []).forEach(function(r) {
+    rows.forEach(function(r) {
         if (counts[r.time] !== undefined) counts[r.time] += (parseInt(r.guests) || 0);
     });
-
-    var ctrl = appState.controlsCache || {};
-    var dateCtrl = ctrl[date] || { blocked: false, stoppedSlots: [] };
 
     appState.slots.forEach(function(slot) {
         slot.booked = counts[slot.time] || 0;
