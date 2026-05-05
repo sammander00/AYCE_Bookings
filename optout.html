@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe — Hell Pizza Bond St</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #111;
+            color: #E1D8B7;
+            font-family: 'Barlow', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .card {
+            background: #1a1a1a;
+            border: 1px solid rgba(225,216,183,.1);
+            max-width: 480px;
+            width: 100%;
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .logo { width: 120px; margin: 0 auto 2rem; display: block; }
+        .tag {
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: #C80613;
+            margin-bottom: .8rem;
+        }
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4rem;
+            letter-spacing: .05em;
+            color: #E1D8B7;
+            margin-bottom: 1rem;
+        }
+        p { font-size: .95rem; color: #888; line-height: 1.6; margin-bottom: 1.5rem; }
+        .btn {
+            display: inline-block;
+            background: #C80613;
+            color: #fff;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-family: 'Barlow', sans-serif;
+            font-size: .85rem;
+            font-weight: 700;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: .8rem;
+        }
+        .btn:hover { background: #a00510; }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(225,216,183,.2);
+            color: #E1D8B7;
+        }
+        .btn-secondary:hover { border-color: rgba(225,216,183,.4); }
+        .success { display: none; }
+        .success .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .note { font-size: .75rem; color: #555; margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <img src="https://aycepizza.bond/hell-logo.png" alt="Hell Pizza" class="logo">
+
+    <!-- Confirm state -->
+    <div id="confirmState">
+        <p class="tag">Unsubscribe</p>
+        <h1>Before You Go</h1>
+        <p>You're about to unsubscribe <strong id="emailDisplay" style="color:#E1D8B7;"></strong> from follow-up emails after your Hell Pizza AYCE sessions.</p>
+        <p style="font-size:.85rem;">You'll still receive booking confirmations and reminders — just no post-visit emails.</p>
+        <button class="btn" onclick="confirmOptOut()">Yes, Unsubscribe Me</button>
+        <button class="btn btn-secondary" onclick="window.location.href='https://aycepizza.bond'">Cancel — Keep Me Subscribed</button>
+    </div>
+
+    <!-- Success state -->
+    <div id="successState" class="success">
+        <div class="icon">✓</div>
+        <p class="tag">Done</p>
+        <h1>You're Unsubscribed</h1>
+        <p>We've removed you from follow-up emails. You won't hear from us after your visits anymore.</p>
+        <p style="font-size:.85rem;">Booking confirmations and day-of reminders will still come through.</p>
+        <a href="https://aycepizza.bond" class="btn" style="text-decoration:none;display:block;">Back to Booking</a>
+        <p class="note">Changed your mind? Email us at bond@hell.co.nz and we'll re-subscribe you.</p>
+    </div>
+</div>
+
+<script>
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxWrmERca_Mh5OsURUx7Y8MpmvjOGa9ZmOJN4TDEscpEd_rYUWcKEUpkq6tiQGJ9_YfCQ/exec';
+
+    // Read email and ref from URL params
+    var params = new URLSearchParams(window.location.search);
+    var email = params.get('email') || '';
+    var ref = params.get('ref') || '';
+
+    // Display email
+    var display = document.getElementById('emailDisplay');
+    if (display && email) display.textContent = email;
+
+    function confirmOptOut() {
+        if (!email) {
+            alert('No email address found. Please use the unsubscribe link from your email.');
+            return;
+        }
+
+        // Send opt-out to Apps Script
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ action: 'OPT_OUT', email: email, ref: ref })
+        });
+
+        // Show success immediately (no-cors means we can't read response)
+        document.getElementById('confirmState').style.display = 'none';
+        var success = document.getElementById('successState');
+        success.style.display = 'block';
+    }
+</script>
+</body>
+</html>
