@@ -146,7 +146,6 @@ function initDatePicker() {
 
     // No date auto-selected — user must tap a date to load availability
 }
-}).catch(function(){});
 initDatePicker();
 
 // Auto-refresh every 30s
