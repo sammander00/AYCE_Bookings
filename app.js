@@ -9,7 +9,6 @@ let appState = {
     numGuests: 1,
     selectedTime: null,
     selectedDate: null,
-    controlsCache: null,
     slots: [
         { time: '5:30', booked: 0, capacity: 30, forcedSoldOut: false },
         { time: '6:00', booked: 0, capacity: 30, forcedSoldOut: false },
@@ -147,12 +146,6 @@ function initDatePicker() {
 
     // No date auto-selected — user must tap a date to load availability
 }
-// Pre-warm controls cache immediately so first fetchAvailability skips it
-sbFetch('controls?id=eq.1').then(function(ctrlRows) {
-    appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
-}).catch(function(){});
-sbFetch('controls?id=eq.1').then(function(ctrlRows) {
-    appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
 }).catch(function(){});
 initDatePicker();
 
@@ -335,11 +328,7 @@ function resetForm() {
     updateGuestUI();
     updateSlotsUI();
     showScreen('bookingPage');
-    // Pre-warm controls cache immediately so first fetchAvailability skips it
-sbFetch('controls?id=eq.1').then(function(ctrlRows) {
-    appState.controlsCache = (ctrlRows && ctrlRows.length > 0) ? ctrlRows[0].data : {};
-}).catch(function(){});
-initDatePicker();
+    initDatePicker();
 }
 
 /* ── SUBMIT ── */
